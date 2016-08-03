@@ -1,0 +1,590 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>LAPM.LinearAutonomousPoolModel &mdash; LAPM v1.0</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="LAPM v1.0" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../index.html">Table Of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/LAPM.PH.html">LAPM.PH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/LAPM.LinearAutonomousPoolModel.html">LAPM.LinearAutonomousPoolModel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/LAPM.ExampleModels.html">LAPM.ExampleModels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/LAPM.emanuel.html">LAPM.emanuel</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for LAPM.LinearAutonomousPoolModel</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Module for linear autonomous pool models.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span>
+
+<span class="kn">from</span> <span class="nn">sympy</span> <span class="k">import</span> <span class="n">symbols</span><span class="p">,</span> <span class="n">Matrix</span><span class="p">,</span> <span class="n">exp</span><span class="p">,</span> <span class="n">ones</span><span class="p">,</span> <span class="n">diag</span><span class="p">,</span> <span class="n">simplify</span><span class="p">,</span> <span class="n">eye</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">factorial</span><span class="p">,</span> <span class="n">sqrt</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">array</span>
+<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="k">import</span> <span class="n">expm</span>
+
+<span class="c1"># import the phase-type distribution</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">PH</span>
+
+<span class="c1">#############################################</span>
+<span class="c1"># Linear autonomous compartment model class #</span>
+<span class="c1"># d/dt x(t) = Ax(t) + u                     #</span>
+<span class="c1">#############################################</span>
+
+
+<span class="k">def</span> <span class="nf">_age_vector_dens</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">Qt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the (symbolic) probability density vector of the compartment ages.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        u (SymPy dx1-matrix): external input vector</span>
+<span class="sd">        A (SymPy dxd-matrix): compartment matrix</span>
+<span class="sd">        Qt (SymPy dxd-matrix): Qt = :math:`e^{t\\,\\bf{A}}`</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        SymPy dx1-matrix: probability density vector of the compartment ages</span>
+<span class="sd">            :math:`\\bf{f_a}(y) = (\\bf{X^\\ast})^{-1}\\,e^{y\\,\\bf{A}}\\,\\bf{u}`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">xss</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">A</span><span class="o">**-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">u</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">diag</span><span class="p">(</span><span class="o">*</span><span class="n">xss</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">X</span><span class="o">**-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">Qt</span><span class="o">*</span><span class="n">u</span>
+
+<span class="k">def</span> <span class="nf">_age_vector_nth_moment</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the (symbolic) vector of nth moments of the compartment ages.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        u (SymPy dx1-matrix): external input vector</span>
+<span class="sd">        A (SymPy dxd-matrix): compartment matrix</span>
+<span class="sd">        n (positive int): order of the moment</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        SymPy dx1-matrix: vector of nth moments of the compartment ages</span>
+<span class="sd">            :math:`\\mathbb{E}[\\bf{a}^n] = (-1)^n\\,n!\\,(\\bf{X^\\ast})^{-1}\\,\\bf{A}^{-n}\\,\\bf{x^\\ast}`</span>
+<span class="sd">    </span>
+<span class="sd">    See Also:</span>
+<span class="sd">        :func:`_age_vector_exp`: Return the (symbolic) vector of expected values of the compartment ages.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">xss</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">A</span><span class="o">**-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">u</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">diag</span><span class="p">(</span><span class="o">*</span><span class="n">xss</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="n">n</span><span class="o">*</span><span class="n">factorial</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">X</span><span class="o">**-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">A</span><span class="o">**-</span><span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="n">xss</span>
+
+<span class="k">def</span> <span class="nf">_age_vector_exp</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">A</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the (symbolic) vector of expected values of the compartment ages.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        u (SymPy dx1-matrix): external input vector</span>
+<span class="sd">        A (SymPy dxd-matrix): compartment matrix</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        SymPy dx1-matrix: vector of expected values of the compartment ages</span>
+<span class="sd">            :math:`\\mathbb{E}[\\bf{a}] = -(\\bf{X^\\ast})^{-1}\\,\\bf{A}^{-1}\\,\\bf{x^\\ast}`</span>
+<span class="sd">    </span>
+<span class="sd">    See Also:</span>
+<span class="sd">        :func:`_age_vector_nth_moment`: Return the (symbolic) vector of nth moments of the compartment ages.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_age_vector_nth_moment</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_age_vector_variance</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">A</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the (symbolic) vector of variances of the compartment ages.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        u (SymPy dx1-matrix): external input vector</span>
+<span class="sd">        A (SymPy dxd-matrix): compartment matrix</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        SymPy dx1-matrix: vector of variances of the compartment ages</span>
+<span class="sd">            :math:`\\sigma^2(\\bf{a}) = \\mathbb{E}[\\bf{a}^2] - (\\mathbb{E}[\\bf{a}])^2` component-wise</span>
+<span class="sd">    </span>
+<span class="sd">    See Also:</span>
+<span class="sd">        | :func:`_age_vector_exp`: Return the (symbolic) vector of expected values of the compartment ages.</span>
+<span class="sd">        | :func:`_age_vector_nth_moment`: Return the (symbolic) vector of nth moments of the compartment ages.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sv</span> <span class="o">=</span> <span class="n">_age_vector_nth_moment</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">ev</span> <span class="o">=</span> <span class="n">_age_vector_exp</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
+    <span class="n">vl</span> <span class="o">=</span> <span class="p">[</span><span class="n">sv</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">ev</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sv</span><span class="o">.</span><span class="n">rows</span><span class="p">)]</span>
+    
+    <span class="k">return</span> <span class="n">Matrix</span><span class="p">(</span><span class="n">sv</span><span class="o">.</span><span class="n">rows</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">vl</span><span class="p">)</span>
+    
+<span class="k">def</span> <span class="nf">_age_vector_sd</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">A</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the (symbolic) vector of standard deviations of the compartment ages.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        u (SymPy dx1-matrix): external input vector</span>
+<span class="sd">        A (SymPy dxd-matrix): compartment matrix</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        SymPy dx1-matrix: vector of standard deviations of the compartment ages</span>
+<span class="sd">            :math:`\\sigma(\\bf{a}) = \\sqrt{\\sigma^2(\\bf{a})}` component-wise</span>
+<span class="sd">    </span>
+<span class="sd">    See Also:</span>
+<span class="sd">        :func:`_age_vector_variance`: Return the (symbolic) vector of variances of the compartment ages.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sdl</span> <span class="o">=</span> <span class="p">[</span><span class="n">sqrt</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">_age_vector_variance</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">A</span><span class="p">)]</span>
+    
+    <span class="k">return</span> <span class="n">Matrix</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sdl</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sdl</span><span class="p">)</span>
+
+
+<span class="c1">############################################################################</span>
+
+
+<div class="viewcode-block" id="LinearAutonomousPoolModel"><a class="viewcode-back" href="../../_autosummary/LAPM.LinearAutonomousPoolModel.html#LAPM.ExampleModels.LinearAutonomousPoolModel">[docs]</a><span class="k">class</span> <span class="nc">LinearAutonomousPoolModel</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;General class of linear autonomous compartment models.</span>
+
+<span class="sd">    :math:`\\frac{d}{dt} \\bf{x}(t) = \\bf{A}\\,\\bf{x}(t) + \\bf{u}`</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        - symbolic matrix exponential Qt = :math:`e^{tA}` cannot be computed automatically</span>
+<span class="sd">        - for symbolic computations it has to be given manually: model.Qt = ...</span>
+<span class="sd">        - otherwise only numerical computations possible</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        A (SymPy dxd-matrix): The model&#39;s compartment matrix.</span>
+<span class="sd">        u (SymPy dx1-matrix): The model&#39;s external input vector.</span>
+<span class="sd">        Qt (SymPy dxd-matrix): Qt = :math:`e^{t\\,\\bf{A}}`                    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">A</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a linear autonomous compartment model with external inputs u and compartment matrix A.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (SymPy dx1-matrix): external input vector</span>
+<span class="sd">            A (SymPy dxd-matrix): compartment matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># cover one-dimensional input</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="s1">&#39;is_Matrix&#39;</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">u</span><span class="o">.</span><span class="n">is_Matrix</span><span class="p">):</span> <span class="n">u</span> <span class="o">=</span> <span class="n">Matrix</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="n">u</span><span class="p">])</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="s1">&#39;is_Matrix&#39;</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">A</span><span class="o">.</span><span class="n">is_Matrix</span><span class="p">):</span> <span class="n">A</span> <span class="o">=</span> <span class="n">Matrix</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="n">A</span><span class="p">])</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">A</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="n">u</span>  
+
+        <span class="c1"># compute matrix exponential if no symbols are involved</span>
+        <span class="k">if</span> <span class="n">A</span><span class="o">.</span><span class="n">is_Matrix</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">free_symbols</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;t&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Qt</span> <span class="o">=</span> <span class="n">exp</span><span class="p">(</span><span class="n">t</span><span class="o">*</span><span class="n">A</span><span class="p">)</span>
+
+    <span class="c1"># private methods</span>
+
+    <span class="k">def</span> <span class="nf">_get_Qt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return matrix exponential of A symbolically if possible or numerically.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x (nonnegative):</span>
+<span class="sd">            time at which the matrix exponential is to be evaluated</span>
+<span class="sd">            None: purely symbolic treatment</span>
+<span class="sd">            nonnegative value: symbolic treatment at time x if possible, otherwise purely numeric treatment</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Sympy or NumPy dxd-matrix: :math:`e^{x\\,\\bf{A}}</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If purely symbolic treatment is intended by no symbolic matrix exponential is available.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># purely symbolic case</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Qt&#39;</span><span class="p">):</span>
+                <span class="k">raise</span><span class="p">(</span><span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;No matrix exponential given for symbolic calculations&#39;</span><span class="p">))</span>
+
+            <span class="n">Qt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Qt</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># numerical case</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Qt&#39;</span><span class="p">):</span>
+                <span class="c1"># if self.Qt exists, calculate symbolically and substitute t by time</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;t&#39;</span><span class="p">)</span>
+                <span class="n">Qt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="n">t</span><span class="p">:</span> <span class="n">x</span><span class="p">})</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># purely numerical calculation</span>
+                <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span>
+                <span class="n">D</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">cols</span><span class="p">)]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">rows</span><span class="p">)],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">Qt</span> <span class="o">=</span> <span class="n">expm</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Qt</span>
+
+
+    <span class="c1"># public methods</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">beta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;Return the initial distribution of the according Markov chain.</span>
+<span class="sd">    </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy or numerical dx1-matrix: :math:`\\bf{\\beta} = \\frac{\\bf{u}}{\\|\\bf{u}\\|}`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="o">/</span><span class="nb">sum</span><span class="p">([</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">xss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;Return the (symbolic) steady state vector.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy or numerical dx1-matrix: :math:`\\bf{x^\\ast} = -\\bf{A}^{-1}\\,\\bf{u}`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">**-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">u</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">eta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;Return the initial distribution of the Markov chain according to system age.</span>
+<span class="sd">    </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy or numerical dx1-matrix: :math:`\\bf{\\eta} = \\frac{\\bf{x^\\ast}}{\\|\\bf{x^\\ast}\\|}`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xss</span><span class="o">/</span><span class="nb">sum</span><span class="p">([</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">xss</span><span class="p">])</span>
+   
+ 
+    <span class="c1"># transit time</span>
+<div class="viewcode-block" id="LinearAutonomousPoolModel.T_cum_dist_func"><a class="viewcode-back" href="../../_autosummary/LAPM.LinearAutonomousPoolModel.html#LAPM.ExampleModels.LinearAutonomousPoolModel.T_cum_dist_func">[docs]</a>    <span class="k">def</span> <span class="nf">T_cum_dist_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the cumulative distribution function of the transit time.</span>
+<span class="sd">    </span>
+<span class="sd">        Args:</span>
+<span class="sd">            time (nonnegative, optional): time at which :math:`F_T` is to be evaluated,</span>
+<span class="sd">                defaults to None: purely symbolic treatment</span>
+<span class="sd">    </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy expression or numerical value: cumulative distribution function of the transit time (evaluated at time)</span>
+
+<span class="sd">        See Also:</span>
+<span class="sd">            :func:`.PH.cum_dist_func`</span>
+<span class="sd">        &quot;&quot;&quot;</span> 
+        <span class="n">Qt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_Qt</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">PH</span><span class="o">.</span><span class="n">cum_dist_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">Qt</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearAutonomousPoolModel.T_density"><a class="viewcode-back" href="../../_autosummary/LAPM.LinearAutonomousPoolModel.html#LAPM.ExampleModels.LinearAutonomousPoolModel.T_density">[docs]</a>    <span class="k">def</span> <span class="nf">T_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;Return the probability density of the transit time.</span>
+<span class="sd">    </span>
+<span class="sd">        Args:</span>
+<span class="sd">            time (nonnegative, optional): time at which :math:`f_T` is to be evaluated,</span>
+<span class="sd">                defaults to None: purely symbolic treatment</span>
+<span class="sd">    </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy expression or numerical value: probability density of the transit time (evaluated at time)</span>
+
+<span class="sd">        See Also:</span>
+<span class="sd">            :func:`.PH.density`</span>
+<span class="sd">        &quot;&quot;&quot;</span> 
+        <span class="n">Qt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_Qt</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">PH</span><span class="o">.</span><span class="n">density</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">Qt</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">T_expected_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;Return the (symbolic) expected value of the transit time.</span>
+
+<span class="sd">        See Also:</span>
+<span class="sd">            :func:`.PH.expected_value`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">PH</span><span class="o">.</span><span class="n">expected_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">T_standard_deviation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;Return the (symbolic) standard deviation of the transit time.</span>
+
+<span class="sd">        See Also:</span>
+<span class="sd">            :func:`.PH.standard_deviation`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">PH</span><span class="o">.</span><span class="n">standard_deviation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">T_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the (symbolic) variance of the transit time.</span>
+
+<span class="sd">        See Also:</span>
+<span class="sd">            :func:`.PH.variance`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">PH</span><span class="o">.</span><span class="n">variance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LinearAutonomousPoolModel.T_nth_moment"><a class="viewcode-back" href="../../_autosummary/LAPM.LinearAutonomousPoolModel.html#LAPM.ExampleModels.LinearAutonomousPoolModel.T_nth_moment">[docs]</a>    <span class="k">def</span> <span class="nf">T_nth_moment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the (symbolic) nth moment of the transit time.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            n (positive int): order of the moment</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy expression or numerical value: :math:`\mathbb{E}[T^n]`</span>
+
+<span class="sd">        See Also:</span>
+<span class="sd">            :func:`.PH.nth_moment`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">PH</span><span class="o">.</span><span class="n">nth_moment</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span></div>
+
+
+    <span class="c1"># system age</span>
+<div class="viewcode-block" id="LinearAutonomousPoolModel.A_cum_dist_func"><a class="viewcode-back" href="../../_autosummary/LAPM.LinearAutonomousPoolModel.html#LAPM.ExampleModels.LinearAutonomousPoolModel.A_cum_dist_func">[docs]</a>    <span class="k">def</span> <span class="nf">A_cum_dist_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">age</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;Return the cumulative distribution function of the system age.</span>
+<span class="sd">    </span>
+<span class="sd">        Args:</span>
+<span class="sd">            age (nonnegative, optional): age at which :math:`F_A` is to be evaluated,</span>
+<span class="sd">                defaults to None: purely symbolic treatment</span>
+<span class="sd">    </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy expression or numerical value: cumulative distribution function of PH(:math:`\\bf{\\eta}`, :math:`\\bf{A}`) </span>
+<span class="sd">            (evaluated at age)</span>
+
+<span class="sd">        See Also:</span>
+<span class="sd">            :func:`.PH.cum_dist_func`</span>
+<span class="sd">        &quot;&quot;&quot;</span> 
+        <span class="n">Qt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_Qt</span><span class="p">(</span><span class="n">age</span><span class="p">)</span>
+        <span class="n">t</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;t y&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">PH</span><span class="o">.</span><span class="n">cum_dist_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">Qt</span><span class="p">)</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="n">t</span><span class="p">:</span><span class="n">y</span><span class="p">})</span></div>
+    
+<div class="viewcode-block" id="LinearAutonomousPoolModel.A_density"><a class="viewcode-back" href="../../_autosummary/LAPM.LinearAutonomousPoolModel.html#LAPM.ExampleModels.LinearAutonomousPoolModel.A_density">[docs]</a>    <span class="k">def</span> <span class="nf">A_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">age</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;Return the probability density of the system age.</span>
+<span class="sd">    </span>
+<span class="sd">        Args:</span>
+<span class="sd">            age (nonnegative, optional): age at which :math:`f_A` is to be evaluated,</span>
+<span class="sd">                defaults to None: purely symbolic treatment</span>
+<span class="sd">    </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy expression or numerical value: probability density of PH(:math:`\\bf{\\eta}`, :math:`\\bf{A}`) </span>
+<span class="sd">            (evaluated at age)</span>
+
+<span class="sd">        See Also:</span>
+<span class="sd">            :func:`.PH.density`</span>
+<span class="sd">        &quot;&quot;&quot;</span> 
+        <span class="n">Qt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_Qt</span><span class="p">(</span><span class="n">age</span><span class="p">)</span>
+        <span class="n">t</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;t y&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">PH</span><span class="o">.</span><span class="n">density</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">Qt</span><span class="p">)</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="n">t</span><span class="p">:</span><span class="n">y</span><span class="p">})</span></div>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">A_expected_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;Return the (symbolic) expected value of the system age.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy expression or numerical value: expected value of PH(:math:`\\bf{\\eta}`, :math:`\\bf{A}`) </span>
+
+<span class="sd">        See Also:</span>
+<span class="sd">            :func:`.PH.expected_value`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">t</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;t y&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">PH</span><span class="o">.</span><span class="n">expected_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="n">t</span><span class="p">:</span><span class="n">y</span><span class="p">})</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">A_standard_deviation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;Return the (symbolic) standard deviation of the system age.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy expression or numerical value: standard deviation of PH(:math:`\\bf{\\eta}`, :math:`\\bf{A}`) </span>
+
+<span class="sd">        See Also:</span>
+<span class="sd">            :func:`.PH.standard_deviation`</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">PH</span><span class="o">.</span><span class="n">standard_deviation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">A_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the (symbolic) variance of the system age.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy expression or numerical value: variance of PH(:math:`\\bf{\\eta}`, :math:`\\bf{A}`) </span>
+
+<span class="sd">        See Also:</span>
+<span class="sd">            :func:`.PH.variance`</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">PH</span><span class="o">.</span><span class="n">variance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LinearAutonomousPoolModel.A_nth_moment"><a class="viewcode-back" href="../../_autosummary/LAPM.LinearAutonomousPoolModel.html#LAPM.ExampleModels.LinearAutonomousPoolModel.A_nth_moment">[docs]</a>    <span class="k">def</span> <span class="nf">A_nth_moment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the (symbolic) nth moment of the system age.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            n (positive int): order of the moment</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy expression or numerical value: nth moment of PH(:math:`\\bf{\\eta}`, :math:`\\bf{A}`) </span>
+
+<span class="sd">        See Also:</span>
+<span class="sd">            :func:`.PH.nth_moment`</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">PH</span><span class="o">.</span><span class="n">nth_moment</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eeta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span></div>
+
+
+    <span class="c1"># compartment age</span>
+<div class="viewcode-block" id="LinearAutonomousPoolModel.a_density"><a class="viewcode-back" href="../../_autosummary/LAPM.LinearAutonomousPoolModel.html#LAPM.ExampleModels.LinearAutonomousPoolModel.a_density">[docs]</a>    <span class="k">def</span> <span class="nf">a_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">age</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;Return the probability density vector of the compartment ages.</span>
+<span class="sd">    </span>
+<span class="sd">        Args:</span>
+<span class="sd">            age (nonnegative, optional): age at which :math:`\\bf{f_a}` is to be evaluated,</span>
+<span class="sd">                defaults to None: purely symbolic treatment</span>
+<span class="sd">    </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy or numerical dx1-matrix: :math:`f_a` (evaluated at age) </span>
+<span class="sd">                :math:`\\bf{f_a}(y) = (\\bf{X^\\ast})^{-1}\\,e^{y\\,\\bf{A}}\\,\\bf{u}`</span>
+<span class="sd">        &quot;&quot;&quot;</span> 
+        <span class="n">Qt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_Qt</span><span class="p">(</span><span class="n">age</span><span class="p">)</span>
+        <span class="n">t</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;t y&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_age_vector_dens</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">Qt</span><span class="p">)</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="n">t</span><span class="p">:</span><span class="n">y</span><span class="p">})</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">a_expected_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;Return the (symbolic) vector of expected values of the compartment ages.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy dx1-matrix:</span>
+<span class="sd">            :math:`\\mathbb{E}[\\bf{a}] = -(\\bf{X^\\ast})^{-1}\\,\\bf{A}^{-1}\\,\\bf{x^\\ast}`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">t</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;t y&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_age_vector_exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">a_standard_deviation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;Return the (symbolic) vector of standard deviations of the compartment ages.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy dx1-matrix:</span>
+<span class="sd">            :math:`\\sigma(\\bf{a}) = \\sqrt{\\sigma^2(\\bf{a})}` component-wise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_age_vector_sd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">a_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the (symbolic) vector of variances of the compartment ages.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy dx1-matrix:</span>
+<span class="sd">            :math:`\\sigma^2(\\bf{a}) = \\mathbb{E}[\\bf{a}^2] - (\\mathbb{E}[\\bf{a}])^2` component-wise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_age_vector_variance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LinearAutonomousPoolModel.a_nth_moment"><a class="viewcode-back" href="../../_autosummary/LAPM.LinearAutonomousPoolModel.html#LAPM.ExampleModels.LinearAutonomousPoolModel.a_nth_moment">[docs]</a>    <span class="k">def</span> <span class="nf">a_nth_moment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the (symbolic) vector of the nth moments of the compartment ages.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            n (positive int): order of the moment</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy or numerical dx1-matrix:</span>
+<span class="sd">            :math:`\\mathbb{E}[\\bf{a}^n] = (-1)^n\\,n!\\,(\\bf{X^\\ast})^{-1}\\,\\bf{A}^{-n}\\,\\bf{x^\\ast}`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_age_vector_nth_moment</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span></div>
+
+
+    <span class="c1"># Laplacians for T and A</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">T_laplace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;Return the symbolic Laplacian of the transit time.</span>
+
+<span class="sd">        See Also:</span>
+<span class="sd">            :func:`.PH.laplace`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">simplify</span><span class="p">(</span><span class="n">PH</span><span class="o">.</span><span class="n">laplace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">))</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">A_laplace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;Return the symbolic Laplacian of the system age.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy expression: Laplace transform of the probability density of PH(:math:`\\bf{\\eta}`, :math:`\\bf{A}`) </span>
+
+<span class="sd">        See Also:</span>
+<span class="sd">            :func:`.PH.laplace`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">simplify</span><span class="p">(</span><span class="n">PH</span><span class="o">.</span><span class="n">laplace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">))</span>
+
+
+    <span class="c1"># release</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">r_compartments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the (symbolic) release vector of the system in steady state.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy or numerical dx1-matrix: :math:`r_j = z_j * x^\\ast_j`</span>
+
+<span class="sd">        See Also:</span>
+<span class="sd">            | :func:`.PH.z`</span>
+<span class="sd">            | :func:`xss`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">PH</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xss</span><span class="o">.</span><span class="n">rows</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="n">PH</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">)[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">xss</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xss</span><span class="o">.</span><span class="n">rows</span><span class="p">)])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">r_total</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the (symbolic) total system release in steady state.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy expression or numerical value: :math:`r = \sum_j r_j`</span>
+
+<span class="sd">        See Also:</span>
+<span class="sd">            :func:`r_compartments`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r_compartments</span><span class="p">)</span></div>
+       
+ 
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2016, Holger Metzler.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
