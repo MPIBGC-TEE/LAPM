@@ -35,10 +35,10 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
-    'sphinx.ext.githubpages',
     'sphinx.ext.napoleon',
     'sphinx.ext.autosummary'
 ]
+#    'sphinx.ext.githubpages',
 
 # Napoleon settings
 napoleon_google_docstring = True
