@@ -1,1 +1,5 @@
+-e git://github.com/sphinx-doc/sphinx.git@stable#egg=Sphinx-origin_stable
 numpy
+sympy
+matplotlib
+

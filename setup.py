@@ -29,10 +29,12 @@ setup(name='LAPM',
                 ]
         },
         install_requires=[
-          'sympy',
-          'numpy',
-    	  'matplotlib',
         ],
+        # took out
+        #  'sympy'
+        #  'numpy',
+    	#  'matplotlib',
+        # to hopefully make RTD work
         include_package_data=True,
         zip_safe=False)
 
