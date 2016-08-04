@@ -31,7 +31,7 @@ setup(name='LAPM',
         install_requires=[
           'sympy',
           'numpy',
-	  'matplotlib',
+    	  'matplotlib',
         ],
         include_package_data=True,
         zip_safe=False)
