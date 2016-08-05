@@ -1,4 +1,4 @@
--e git://github.com/sphinx-doc/sphinx.git@stable#egg=Sphinx-origin_stable
+-e git://github.com/goujou/sphinx-repaired
 numpy
 sympy
 matplotlib

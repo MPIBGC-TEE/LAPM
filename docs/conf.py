@@ -19,7 +19,20 @@
 #
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath('..'))
+
+# mock packages depending on C libraries for import
+from unittest.mock import MagicMock
+
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+            return Mock()
+
+MOCK_MODULES = ['numpy', 'sympy', 'sympy.printing', 'matplotlib', 'matplotlib.pyplot', 'matplotlib.ticker', 'scipy.linalg']
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+
 
 # -- General configuration ------------------------------------------------
 
