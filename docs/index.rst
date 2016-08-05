@@ -31,8 +31,6 @@ Table of Contents
     -----------
     ~LAPM.emanuel
 
-----------------
-
 Important Note
 --------------
 
@@ -41,9 +39,6 @@ Important Note
 * :math:`a_{ii}<0` for all :math:`i`
 * :math:`a_{ij}\geq 0` for :math:`i\neq j`
 * :math:`\sum\limits_{i=1}^d a_{ij}\leq 0` for all :math:`j`
-
-
----------------------------
 
 Indices and tables
 ------------------
