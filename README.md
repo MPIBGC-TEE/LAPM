@@ -12,7 +12,8 @@ rely on properties of this distribution. They are treated in a separate module.
 ---
 
 Be sure to have installed the following packages:
-1. numpy
-1. scipy
-1. sympy
-1. matplotlib
+
++ numpy
++ scipy
++ sympy
++ matplotlib
