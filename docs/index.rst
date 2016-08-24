@@ -34,7 +34,7 @@ Table of Contents
 Important Note
 --------------
 
-:math:`\bf{A=(a_{ij})}` has always to be an invertible *compartment matrix*:
+:math:`\bf{A=(a_{ij})}` has always to be an invertible *compartmental matrix*:
 
 * :math:`a_{ii}<0` for all :math:`i`
 * :math:`a_{ij}\geq 0` for :math:`i\neq j`

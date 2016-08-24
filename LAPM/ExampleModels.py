@@ -40,7 +40,7 @@ class TwoPoolsNoFeedback(LinearAutonomousPoolModel):
         Note:
             The symbolic matrix exponential will be initialized automatically.
         """
-        lamda_1, lamda_2 = symbols('lambda_1 lamda_2', positive=True)
+        lamda_1, lamda_2 = symbols('lamda_1 lamda_2', positive=True)
         A = Matrix([[     -lamda_1,        0],
                     [alpha*lamda_1, -lamda_2]])
         u = Matrix(2, 1, [u_1, u_2])
