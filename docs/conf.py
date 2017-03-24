@@ -25,13 +25,6 @@ sys.path.insert(0, os.path.abspath('..'))
 # mock packages depending on C libraries for import
 from unittest.mock import MagicMock
 
-
-#def __getattr__(classname, x):
-#    if x == "_mock_methods":
-#        return x._mock_methods
-#    else:
-#        return Mock()
-
 class Mock(MagicMock):
     @classmethod
     def __getattr__(cls, name):
@@ -187,7 +180,7 @@ html_sidebars = { '**': ['globaltoc.html', 'relations.html', 'searchbox.html'], 
 
 html_theme_options = {  
     'fixed_sidebar': True,
-    'sidebar_width': '300px',
+    'sidebar_width': '350px',
     'page_width': '1240px'
 }
 
