@@ -1,7 +1,7 @@
 Linear Autonomous Pool Models (LAPM)
 ====================================
 
-`LAPM <https://github.com/goujou/LAPM>`_ is a simple Python package to deal with linear autonomous pool models of the form
+LAPM is a simple Python package to deal with linear autonomous pool models of the form
 
 .. math:: \frac{d}{dt}\,\bf{x}(t) = \bf{A}\,\bf{x}(t) + \bf{u}.
 
@@ -25,20 +25,26 @@ Table of Contents
 .. autosummary::
     :toctree: _autosummary
 
-    ~LAPM.PH
-    ~LAPM.LinearAutonomousPoolModel
-    ~LAPM.ExampleModels
+    ~LAPM.phase_type
+    ~LAPM.linear_autonomous_pool_model
+    ~LAPM.dtmc
+    ~LAPM.example_models
     -----------
     ~LAPM.emanuel
+
+----------------
 
 Important Note
 --------------
 
-:math:`\bf{A=(a_{ij})}` has always to be an invertible *compartmental matrix*:
+:math:`\bf{A}=(a_{ij})` has always to be an invertible *compartmental matrix*:
 
 * :math:`a_{ii}<0` for all :math:`i`
 * :math:`a_{ij}\geq 0` for :math:`i\neq j`
 * :math:`\sum\limits_{i=1}^d a_{ij}\leq 0` for all :math:`j`
+
+
+---------------------------
 
 Indices and tables
 ------------------

@@ -1,12 +1,14 @@
 """Example: Emanuel's model"""
 
 from __future__ import division
+
+from matplotlib.ticker import AutoMinorLocator
+import matplotlib.pyplot as plt
+import numpy as np
 from sympy import Matrix, exp, symbols, latex
 from sympy.printing import pretty, pretty_print, pprint
-from LAPM.LinearAutonomousPoolModel import LinearAutonomousPoolModel
-import matplotlib.pyplot as plt
-from matplotlib.ticker import AutoMinorLocator
-import numpy as np
+
+from LAPM.linear_autonomous_pool_model import LinearAutonomousPoolModel
 
 
 def plot_emanuel_ages(EM):
@@ -31,19 +33,23 @@ def plot_emanuel_ages(EM):
     ax.plot(xdata, ydata, color='black')
     
     # mean system age, system content at mean system age
-    mx, my = (EM.A_expected_value, EM.A_density(age=EM.A_expected_value)*content)
+    mx,my = (EM.A_expected_value, EM.A_density(age=EM.A_expected_value)*content)
     
     # plot vertical line for mean
-    line = ax.plot([mx, mx], [0, my], color="black", linestyle='dashed', linewidth=1)
+    line = ax.plot([mx, mx], [0, my], color="black", linestyle='dashed', 
+                    linewidth=1)
     line[0].set_dashes([1,1])
     
-    ax.annotate('total system', xy=(0,0), ha='right', textcoords='axes fraction', xytext=(0.95,0.85), fontsize=20)
+    ax.annotate('total system', xy=(0,0), ha='right', 
+        textcoords='axes fraction', xytext=(0.95,0.85), fontsize=20)
 
     # write mean
-    ax.annotate('$\\mu=%1.2f$' % mx, xy=(0,0), ha='right', textcoords='axes fraction', xytext=(0.95,0.75), fontsize=16)
+    ax.annotate('$\\mu=%1.2f$' % mx, xy=(0,0), ha='right', 
+        textcoords='axes fraction', xytext=(0.95,0.75), fontsize=16)
 
     # write standard deviation
-    ax.annotate('$\\sigma=%1.2f$' % EM.A_standard_deviation, xy=(0,0), ha='right', textcoords='axes fraction', xytext=(0.95,0.65), fontsize=16)
+    ax.annotate('$\\sigma=%1.2f$' % EM.A_standard_deviation, xy=(0,0), 
+        ha='right', textcoords='axes fraction', xytext=(0.95,0.65), fontsize=16)
     
     # improve plot layout
     ax.set_xlim([0, xdata[-1]])

@@ -31,7 +31,7 @@ class Mock(MagicMock):
             return Mock()
 
 MOCK_MODULES = ['numpy', 'sympy', 'sympy.printing', 'matplotlib', 'matplotlib.pyplot', 'matplotlib.ticker', 'scipy.linalg']
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+#sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 
 # -- General configuration ------------------------------------------------
@@ -67,6 +67,9 @@ napoleon_use_rtype = True
 
 # activate autosummary
 autosummary_generate = True
+
+# for classes show the class docstring and the __init__ docstring
+autoclass_content = 'both'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

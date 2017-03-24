@@ -1,11 +1,11 @@
 # vim:set ff=unix expandtab ts=4 sw=4:
 from setuptools import setup, find_packages
 def readme():
-    with open('README.md') as f:
+    with open('README.rst') as f:
         return f.read()
 
 setup(name='LAPM',
-        version='1.0',
+        version='1.1',
         #test_suite="example_package.tests",#http://pythonhosted.org/setuptools/setuptools.html#test
         description='Linear Autonomous Pool Models',
         long_description=readme(),#avoid duplication 
@@ -34,6 +34,8 @@ setup(name='LAPM',
         #  'sympy'
         #  'numpy',
     	#  'matplotlib',
+        #  'concurrencytest'
+        #  'scipy'
         # to hopefully make RTD work
         include_package_data=True,
         zip_safe=False)
