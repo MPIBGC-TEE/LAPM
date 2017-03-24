@@ -1,4 +1,3 @@
-README.rst
 setup.py
 LAPM/__init__.py
 LAPM/dtmc.py

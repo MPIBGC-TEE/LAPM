@@ -1,7 +1,7 @@
 # vim:set ff=unix expandtab ts=4 sw=4:
 from setuptools import setup, find_packages
 def readme():
-    with open('README.rst') as f:
+    with open('README.md') as f:
         return f.read()
 
 setup(name='LAPM',
@@ -35,7 +35,8 @@ setup(name='LAPM',
         #  'numpy',
     	#  'matplotlib',
         #  'concurrencytest'
-        #  'scipy'
+        #  'scipy',
+        #  'mock'
         # to hopefully make RTD work
         include_package_data=True,
         zip_safe=False)

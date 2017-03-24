@@ -7,6 +7,7 @@ pip3 install sympy
 pip3 install matplotlib
 pip3 install scipy
 pip3 install concurrencytest
+pip3 install mock
 
 # $1 could be 'develop'
 python3 setup.py $1
