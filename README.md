@@ -12,9 +12,15 @@ module.
 
 ---
 
-Be sure to have installed the following packages:
+Installation simply via the install script `install.sh`.
+
+---
+
+If you do not use the install script, be sure to have installed the following 
+packages:
 
 + numpy
 + scipy
 + sympy
 + matplotlib
+

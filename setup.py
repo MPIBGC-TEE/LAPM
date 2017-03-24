@@ -36,7 +36,6 @@ setup(name='LAPM',
     	#  'matplotlib',
         #  'concurrencytest'
         #  'scipy',
-        #  'mock'
         # to hopefully make RTD work
         include_package_data=True,
         zip_safe=False)
