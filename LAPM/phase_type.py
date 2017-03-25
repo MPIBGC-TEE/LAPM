@@ -60,7 +60,7 @@ def expected_value(beta, A):
     return nth_moment(beta, A, 1)
 
 def nth_moment(beta, A, n):
-    """Return the (symbolic) `n` th moment of the phase-type distribution.
+    """Return the (symbolic) ``n`` th moment of the phase-type distribution.
 
     Args:
         beta (SymPy dx1-matrix): initial distribution vector
@@ -68,7 +68,7 @@ def nth_moment(beta, A, n):
         n (positive int): order of the moment
     
     Returns:
-        SymPy expression: `n` th moment of 
+        SymPy expression: ``n`` th moment of 
         PH(:math:`\\beta`, :math:`A`)
             
             :math:`\\mathbb{E}[T^n]=` 

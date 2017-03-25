@@ -92,8 +92,8 @@ def _age_vector_exp(u, A):
         :math:`\\mathbb{E}[a] = -(X^\\ast)^{-1}\\,A^{-1}\\,x^\\ast`
     
     See Also:
-        :func:`_age_vector_nth_moment`: Return the (symbolic) vector of `n`th 
-        moments of the compartment ages.
+        :func:`_age_vector_nth_moment`: Return the (symbolic) vector of 
+        ``n`` th moments of the compartment ages.
     """
     return _age_vector_nth_moment(u, A, 1)
 
@@ -113,8 +113,8 @@ def _age_vector_variance(u, A):
     See Also:
         | :func:`_age_vector_exp`: Return the (symbolic) vector of expected 
             values of the compartment ages.
-        | :func:`_age_vector_nth_moment`: Return the (symbolic) vector of `n`th
-            moments of the compartment ages.
+        | :func:`_age_vector_nth_moment`: Return the (symbolic) vector of 
+            ``n`` th moments of the compartment ages.
     """
     sv = _age_vector_nth_moment(u, A, 2)
     ev = _age_vector_exp(u, A)
@@ -201,7 +201,7 @@ class LinearAutonomousPoolModel(object):
         - symbolical computations can take very long, in particular
           for complicated systems. An enforced purely numerical
           treatment could then be the right choice; choose
-          `force_numerical=True`
+          ``force_numerical=True``
         - number of pools denoted by :math:`d`
         - steady state vector denoted by 
           :math:`x^\\ast=-A^{-1}\\,u`
@@ -360,8 +360,8 @@ class LinearAutonomousPoolModel(object):
             function of the transit time (evaluated at time)
 
         See Also:
-            :func:`.phase_type.density`: Return the (symbolic) probability density 
-            function of the phase-type distribution.
+            :func:`.phase_type.density`: Return the (symbolic) probability 
+            density function of the phase-type distribution.
         """ 
         Qt = self._get_Qt(time)
 
@@ -372,8 +372,8 @@ class LinearAutonomousPoolModel(object):
         """Return the (symbolic) expected value of the transit time.
 
         See Also:
-            :func:`.phase_type.expected_value`: Return the (symbolic) expected value
-            of the phase-type distribution.
+            :func:`.phase_type.expected_value`: Return the (symbolic) expected 
+            value of the phase-type distribution.
         """
         return phase_type.expected_value(self.beta, self.A)
 
@@ -382,8 +382,8 @@ class LinearAutonomousPoolModel(object):
         """Return the (symbolic) standard deviation of the transit time.
 
         See Also:
-            :func:`.phase_type.standard_deviation`: Return the (symbolic) standard 
-            deviation of the phase-type distribution.
+            :func:`.phase_type.standard_deviation`: Return the (symbolic) 
+            standard deviation of the phase-type distribution.
         """
         return phase_type.standard_deviation(self.beta, self.A)
 
@@ -398,7 +398,7 @@ class LinearAutonomousPoolModel(object):
         return phase_type.variance(self.beta, self.A)
 
     def T_nth_moment(self, n):
-        """Return the (symbolic) `n` th moment of the transit time.
+        """Return the (symbolic) ``n`` th moment of the transit time.
         
         Args:
             n (positive int): order of the moment
@@ -407,8 +407,8 @@ class LinearAutonomousPoolModel(object):
             SymPy expression or numerical value: :math:`\mathbb{E}[T^n]`
 
         See Also:
-            :func:`.phase_type.nth_moment`: Return the (symbolic) `n` th moment of the
-            phase-type distribution.
+            :func:`.phase_type.nth_moment`: Return the (symbolic) ``n`` th 
+            moment of the phase-type distribution.
         """
         return phase_type.nth_moment(self.beta, self.A, n)
 
@@ -472,13 +472,12 @@ class LinearAutonomousPoolModel(object):
                 defaults to None: purely symbolic treatment
     
         Returns:
-            SymPy expression or numerical value: probability density function of 
-            PH(:math:`\\eta`, :math:`A`)
-            (evaluated at age)
+            SymPy expression or numerical value: probability density function 
+            of PH(:math:`\\eta`, :math:`A`) (evaluated at age)
 
         See Also:
-            :func:`.phase_type.density`: Return the (symbolic) probability density 
-            function of the phase-type distribution.
+            :func:`.phase_type.density`: Return the (symbolic) probability 
+            density function of the phase-type distribution.
         """ 
         Qt = self._get_Qt(age)
         t, y = symbols('t y')
@@ -493,8 +492,8 @@ class LinearAutonomousPoolModel(object):
             PH(:math:`\\eta`, :math:`A`) 
 
         See Also:
-            :obj:`.phase_type.expected_value`: Return the (symbolic) expected value 
-            of the phase-type distribution.
+            :obj:`.phase_type.expected_value`: Return the (symbolic) expected 
+            value of the phase-type distribution.
         """
         t, y = symbols('t y')
         return phase_type.expected_value(self.eta, self.A).subs({t:y})
@@ -508,8 +507,8 @@ class LinearAutonomousPoolModel(object):
             PH(:math:`\\eta`, :math:`A`) 
 
         See Also:
-            :func:`.phase_type.standard_deviation`: Return the (symbolic) standard 
-            deviation of the phase-type distribution.
+            :func:`.phase_type.standard_deviation`: Return the (symbolic) 
+            standard deviation of the phase-type distribution.
         """
         return phase_type.standard_deviation(self.eta, self.A)
 
@@ -528,18 +527,18 @@ class LinearAutonomousPoolModel(object):
         return phase_type.variance(self.eta, self.A)
 
     def A_nth_moment(self, n):
-        """Return the (symbolic) `n` th moment of the system age.
+        """Return the (symbolic) ``n`` th moment of the system age.
 
         Args:
             n (positive int): order of the moment
 
         Returns:
-            SymPy expression or numerical value: `n` th moment of 
+            SymPy expression or numerical value: ``n`` th moment of 
             PH(:math:`\\eta`, :math:`A`) 
 
         See Also:
-            :func:`.phase_type.nth_moment`: Return the (symbolic) `n` th moment 
-            of the phase-type distribution.
+            :func:`.phase_type.nth_moment`: Return the (symbolic) ``n`` th 
+            moment of the phase-type distribution.
         """
         return phase_type.nth_moment(self.eeta, self.A, n)
 
@@ -648,7 +647,7 @@ class LinearAutonomousPoolModel(object):
         return _age_vector_variance(self.u, self.A)
 
     def a_nth_moment(self, n):
-        """Return the (symbolic) vector of the `n` th moments of the 
+        """Return the (symbolic) vector of the ``n`` th moments of the 
         compartment ages.
 
         Args:
@@ -735,8 +734,8 @@ class LinearAutonomousPoolModel(object):
             SymPy or numerical dx1-matrix: :math:`r_j = z_j \\, x^\\ast_j`
 
         See Also:
-            | :func:`.phase_type.z`: Return the (symbolic) vector of rates toward 
-                absorbing state.
+            | :func:`.phase_type.z`: Return the (symbolic) vector of rates 
+                toward absorbing state.
             | :obj:`xss`: Return the (symbolic) steady state vector.
         """
         r = phase_type.z(self.A)
@@ -767,7 +766,7 @@ class LinearAutonomousPoolModel(object):
         diagonal entries taken from :math:`-A`.
 
         Returns:
-            :obj:`~.DTMC.DTMC`: :obj:`DTMC` (beta, P)
+            :class:`~.DTMC.DTMC`: :class:`DTMC` (beta, P)
         """
         # A = (P - I) * D
         d = self.A.rows
@@ -793,7 +792,8 @@ class LinearAutonomousPoolModel(object):
         diagonal matrix with entries from the diagonal of :math:`-Q`.
 
         Returns:
-           :obj:`~.DTMC.DTMC`: :obj:`DTMC` (beta_ext, Q) with  beta_ext = (beta, 0)
+           :class:`~.DTMC.DTMC`: :class:`DTMC` (beta_ext, Q) with 
+           beta_ext = (beta, 0)
         """
         A = self.A
         d = A.rows
