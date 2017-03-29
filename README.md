@@ -1,3 +1,5 @@
+# LAPM: Linear Autonomous Pool Models
+
 This is a Python package for linear autonomous pool models.
 It provides a class LinearAutonomousPoolModels that allows 
 computation of transit time, system age, and pool ages.
