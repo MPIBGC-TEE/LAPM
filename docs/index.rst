@@ -1,7 +1,7 @@
 Linear Autonomous Pool Models (LAPM)
 ====================================
 
-`LAPM <https://github.com/goujou/LAPM>`_ is a simple Python package to deal with linear autonomous pool models of the form
+`LAPM <https://github.com/MPIBGC-TEE/LAPM>`_ is a simple Python package to deal with linear autonomous pool models of the form
 
 .. math:: \frac{d}{dt}\,x(t) = A\,x(t) + u.
 

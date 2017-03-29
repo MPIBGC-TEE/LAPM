@@ -186,7 +186,7 @@ html_sidebars = { '**': ['about.html',
 html_theme_options = {  
     'sidebar_width': '350px',
     'page_width': '1240px',
-    'github_user': 'goujou',
+    'github_user': 'MPIBGC-TEE',
     'github_repo': 'LAPM',
     'github_button': False
 }
