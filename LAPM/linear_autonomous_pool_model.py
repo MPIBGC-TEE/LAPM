@@ -211,8 +211,8 @@ class LinearAutonomousPoolModel(object):
           :math:`\\|\\mathbf{v}\\| = \\sum\\limits_{i=1}^d |v_i|`
 
     Attributes:
-        A (SymPy dxd-matrix): The model's compartment matrix.
         u (SymPy dx1-matrix): The model's external input vector.
+        A (SymPy dxd-matrix): The model's compartment matrix.
         Qt (SymPy dxd-matrix): Qt = :math:`e^{t\\,A}`
     """
 
