@@ -87,14 +87,14 @@ def emanuel():
     """
 # old and imprecise values, in particular 0.0322 seems to be a typo in
 # the Emanuel paper
-#    A = Matrix([[-2.0810,        0,       0,       0,        0],
+#    B = Matrix([[-2.0810,        0,       0,       0,        0],
 #                [ 0.8378,  -0.0686,       0,       0,        0],
 #                [      0,        0, -0.5217,       0,        0],
 #                [ 0.5676,   0.0322,  0.1739, -0.5926,        0],
 #                [      0, 4.425e-3,  0.0870, 0.0370, -9.813e-3]])
 
 
-    A = Matrix([[-(25+21+31)/37,              0,             0,          0, 0],
+    B = Matrix([[-(25+21+31)/37,              0,             0,          0, 0],
                           31/37, -(14+15+2)/452,             0,          0, 0],
                               0,              0, -(18+12+6)/69,          0, 0],
                           21/37,         15/452,         12/69, (-45+3)/81, 0],
@@ -103,7 +103,7 @@ def emanuel():
     u = Matrix(5, 1, [77, 0, 36, 0, 0])
 
     # EM is now Emanuel's model
-    EM = LinearAutonomousPoolModel(u, A) 
+    EM = LinearAutonomousPoolModel(u, B) 
     t, y = symbols('t y')
 
     # outputs transit time density formula

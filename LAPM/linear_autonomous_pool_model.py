@@ -14,96 +14,96 @@ from .helpers import entropy
 
 #############################################
 # Linear autonomous compartment model class #
-# d/dt x(t) = Ax(t) + u                     #
+# d/dt x(t) = Bx(t) + u                     #
 #############################################
 
 
-def _age_vector_dens(u, A, Qt):
+def _age_vector_dens(u, B, Qt):
     """Return the (symbolic) probability density vector of the compartment ages.
 
     Args:
         u (SymPy dx1-matrix): external input vector
-        A (SymPy dxd-matrix): compartment matrix
-        Qt (SymPy dxd-matrix): Qt = :math:`e^{t\\,A}`
+        B (SymPy dxd-matrix): compartment matrix
+        Qt (SymPy dxd-matrix): Qt = :math:`e^{t\\,B}`
 
     Returns:
         SymPy dx1-matrix: probability density vector of the compartment ages
-        :math:`f_a(y) = (X^\\ast)^{-1}\\,e^{y\\,A}\\,u`
+        :math:`f_a(y) = (X^\\ast)^{-1}\\,e^{y\\,B}\\,u`
     """
-    xss = -(A**-1)*u
+    xss = -(B**-1)*u
     X = diag(*xss)
     
     return (X**-1)*Qt*u
 
 
-def _age_vector_cum_dist(u, A, Qt):
+def _age_vector_cum_dist(u, B, Qt):
     """Return the (symbolic) cumulative distribution function vector of the 
     compartment ages.
 
     Args:
         u (SymPy dx1-matrix): external input vector
-        A (SymPy dxd-matrix): compartment matrix
-        Qt (SymPy dxd-matrix): Qt = :math:`e^{t\\,A}`
+        B (SymPy dxd-matrix): compartment matrix
+        Qt (SymPy dxd-matrix): Qt = :math:`e^{t\\,B}`
 
     Returns:
         SymPy dx1-matrix: cumulative distribution function vector of the 
         compartment ages
             
-        :math:`f_a(y)=(X^\\ast)^{-1}\\,A^{-1}\\,(e^{y\\,A}-I)\\,u`
+        :math:`f_a(y)=(X^\\ast)^{-1}\\,B^{-1}\\,(e^{y\\,B}-I)\\,u`
     """
-    d = A.rows
-    xss = -(A**-1)*u
+    d = B.rows
+    xss = -(B**-1)*u
     X = diag(*xss)
 
-    return (X**-1)*(A**-1)*(Qt-eye(d))*u
+    return (X**-1)*(B**-1)*(Qt-eye(d))*u
 
 
-def _age_vector_nth_moment(u, A, n):
+def _age_vector_nth_moment(u, B, n):
     """Return the (symbolic) vector of nth moments of the compartment ages.
 
     Args:
         u (SymPy dx1-matrix): external input vector
-        A (SymPy dxd-matrix): compartment matrix
+        B (SymPy dxd-matrix): compartment matrix
         n (positive int): order of the moment
 
     Returns:
         SymPy dx1-matrix: vector of nth moments of the compartment ages
-        :math:`\\mathbb{E}[a^n]=(-1)^n\\,n!\\,X^\\ast)^{-1}\\,A^{-n}\\,x^\\ast`
+        :math:`\\mathbb{E}[a^n]=(-1)^n\\,n!\\,X^\\ast)^{-1}\\,B^{-n}\\,x^\\ast`
     
     See Also:
         :func:`_age_vector_exp`: Return the (symbolic) vector of expected values
         of the compartment ages.
     """
-    xss = -(A**-1)*u
+    xss = -(B**-1)*u
     X = diag(*xss)
 
-    return (-1)**n*factorial(n)*(X**-1)*(A**-n)*xss
+    return (-1)**n*factorial(n)*(X**-1)*(B**-n)*xss
 
 
-def _age_vector_exp(u, A):
+def _age_vector_exp(u, B):
     """Return the (symbolic) vector of expected values of the compartment ages.
 
     Args:
         u (SymPy dx1-matrix): external input vector
-        A (SymPy dxd-matrix): compartment matrix
+        B (SymPy dxd-matrix): compartment matrix
 
     Returns:
         SymPy dx1-matrix: vector of expected values of the compartment ages
-        :math:`\\mathbb{E}[a] = -(X^\\ast)^{-1}\\,A^{-1}\\,x^\\ast`
+        :math:`\\mathbb{E}[a] = -(X^\\ast)^{-1}\\,B^{-1}\\,x^\\ast`
     
     See Also:
         :func:`_age_vector_nth_moment`: Return the (symbolic) vector of 
         ``n`` th moments of the compartment ages.
     """
-    return _age_vector_nth_moment(u, A, 1)
+    return _age_vector_nth_moment(u, B, 1)
 
 
-def _age_vector_variance(u, A):
+def _age_vector_variance(u, B):
     """Return the (symbolic) vector of variances of the compartment ages.
 
     Args:
         u (SymPy dx1-matrix): external input vector
-        A (SymPy dxd-matrix): compartment matrix
+        B (SymPy dxd-matrix): compartment matrix
 
     Returns:
         SymPy dx1-matrix: vector of variances of the compartment ages
@@ -116,20 +116,20 @@ def _age_vector_variance(u, A):
         | :func:`_age_vector_nth_moment`: Return the (symbolic) vector of 
             ``n`` th moments of the compartment ages.
     """
-    sv = _age_vector_nth_moment(u, A, 2)
-    ev = _age_vector_exp(u, A)
+    sv = _age_vector_nth_moment(u, B, 2)
+    ev = _age_vector_exp(u, B)
     vl = [sv[i] - ev[i]**2 for i in range(sv.rows)]
     
     return Matrix(sv.rows, 1, vl)
     
 
-def _age_vector_sd(u, A):
+def _age_vector_sd(u, B):
     """Return the (symbolic) vector of standard deviations of the 
     compartment ages.
 
     Args:
         u (SymPy dx1-matrix): external input vector
-        A (SymPy dxd-matrix): compartment matrix
+        B (SymPy dxd-matrix): compartment matrix
 
     Returns:
         SymPy dx1-matrix: vector of standard deviations of the compartment ages
@@ -139,7 +139,7 @@ def _age_vector_sd(u, A):
         :func:`_age_vector_variance`: Return the (symbolic) vector of variances
         of the compartment ages.
     """
-    sdl = [sqrt(e) for e in _age_vector_variance(u, A)]
+    sdl = [sqrt(e) for e in _age_vector_variance(u, B)]
     
     return Matrix(len(sdl), 1, sdl)
 
@@ -191,10 +191,10 @@ class Error(Exception):
 class LinearAutonomousPoolModel(object):
     """General class of linear autonomous compartment models.
 
-    :math:`\\frac{d}{dt} x(t) = A\\,x(t) + u`
+    :math:`\\frac{d}{dt} x(t) = B\\,x(t) + u`
 
     Notes:
-        - symbolic matrix exponential Qt = :math:`e^{t\\,A}` 
+        - symbolic matrix exponential Qt = :math:`e^{t\\,B}` 
             cannot be computed automatically
         - for symbolic computations it has to be given manually: model.Qt = ...
         - otherwise only numerical computations possible
@@ -204,7 +204,7 @@ class LinearAutonomousPoolModel(object):
           ``force_numerical=True``
         - number of pools denoted by :math:`d`
         - steady state vector denoted by 
-          :math:`x^\\ast=-A^{-1}\\,u`
+          :math:`x^\\ast=-B^{-1}\\,u`
         - normalized steady state vector denoted by
           :math:`\\eta=\\frac{x^\\ast}{\\|x^\\ast\\|}`
         - norm of a vector :math:`v` given by
@@ -212,14 +212,14 @@ class LinearAutonomousPoolModel(object):
 
     Attributes:
         u (SymPy dx1-matrix): The model's external input vector.
-        A (SymPy dxd-matrix): The model's compartment matrix.
-        Qt (SymPy dxd-matrix): Qt = :math:`e^{t\\,A}`
+        B (SymPy dxd-matrix): The model's compartment matrix.
+        Qt (SymPy dxd-matrix): Qt = :math:`e^{t\\,B}`
     """
 
 
-    def __init__(self, u, A, force_numerical=False):
+    def __init__(self, u, B, force_numerical=False):
         """Return a linear autonomous compartment model with external 
-        inputs u and compartment matrix A.
+        inputs u and compartment matrix B.
 
         Symbolical computations can take very long, in particular
         for complicated systems. An enforced purely numerical
@@ -227,7 +227,7 @@ class LinearAutonomousPoolModel(object):
 
         Args:
             u (SymPy dx1-matrix): external input vector
-            A (SymPy dxd-matrix): compartment matrix
+            B (SymPy dxd-matrix): compartment matrix
             force_numerical (boolean, optional): 
                 if True do not try symbolical computations,
                 defaults to False
@@ -235,21 +235,21 @@ class LinearAutonomousPoolModel(object):
         # cover one-dimensional input
         if (not hasattr(u, 'is_Matrix')) or (not u.is_Matrix): 
             u = Matrix(1, 1, [u])
-        if (not hasattr(A, 'is_Matrix')) or (not A.is_Matrix): 
-            A = Matrix(1, 1, [A])
+        if (not hasattr(B, 'is_Matrix')) or (not B.is_Matrix): 
+            B = Matrix(1, 1, [B])
     
-        self.A = A
+        self.B = B
         self.u = u  
 
         # compute matrix exponential if no symbols are involved
-        if (not force_numerical) and (A.is_Matrix and len(A.free_symbols)) == 0:
+        if (not force_numerical) and (B.is_Matrix and len(B.free_symbols)) == 0:
             t = symbols('t')
-            self.Qt = exp(t*A)
+            self.Qt = exp(t*B)
 
     # private methods
 
     def _get_Qt(self, x):
-        """Return matrix exponential of :math:`A` symbolically 
+        """Return matrix exponential of :math:`B` symbolically 
         if possible, or numerically.
 
         Args:
@@ -260,7 +260,7 @@ class LinearAutonomousPoolModel(object):
                 otherwise purely numeric treatment
 
         Returns:
-            Sympy or NumPy dxd-matrix: :math:`e^{x\\,A}
+            Sympy or NumPy dxd-matrix: :math:`e^{x\\,B}
 
         Raises:
             Error: If purely symbolic treatment is intended by no symbolic 
@@ -282,9 +282,9 @@ class LinearAutonomousPoolModel(object):
                 Qt = self.Qt.subs({t: x})
             else:
                 # purely numerical calculation
-                A = self.A
-                D = np.array([[A[i,j] for j in range(A.cols)] 
-                        for i in range(A.rows)], dtype='float32') * float(x)
+                B = self.B
+                D = np.array([[B[i,j] for j in range(B.cols)] 
+                        for i in range(B.rows)], dtype='float32') * float(x)
                 Qt = expm(D)
 
         return Qt
@@ -309,9 +309,9 @@ class LinearAutonomousPoolModel(object):
 
         Returns:
             SymPy or numerical dx1-matrix: 
-                :math:`x^\\ast = -A^{-1}\\,u`
+                :math:`x^\\ast = -B^{-1}\\,u`
         """
-        return -(self.A**-1)*self.u
+        return -(self.B**-1)*self.u
     
     @property
     def eta(self): 
@@ -345,7 +345,7 @@ class LinearAutonomousPoolModel(object):
         """ 
         Qt = self._get_Qt(time)
 
-        return phase_type.cum_dist_func(self.beta, self.A, Qt)
+        return phase_type.cum_dist_func(self.beta, self.B, Qt)
 
     def T_density(self, time=None): 
         """Return the probability density function of the transit time.
@@ -365,7 +365,7 @@ class LinearAutonomousPoolModel(object):
         """ 
         Qt = self._get_Qt(time)
 
-        return phase_type.density(self.beta, self.A, Qt)
+        return phase_type.density(self.beta, self.B, Qt)
 
     @property
     def T_expected_value(self): 
@@ -375,7 +375,7 @@ class LinearAutonomousPoolModel(object):
             :func:`.phase_type.expected_value`: Return the (symbolic) expected 
             value of the phase-type distribution.
         """
-        return phase_type.expected_value(self.beta, self.A)
+        return phase_type.expected_value(self.beta, self.B)
 
     @property
     def T_standard_deviation(self): 
@@ -385,7 +385,7 @@ class LinearAutonomousPoolModel(object):
             :func:`.phase_type.standard_deviation`: Return the (symbolic) 
             standard deviation of the phase-type distribution.
         """
-        return phase_type.standard_deviation(self.beta, self.A)
+        return phase_type.standard_deviation(self.beta, self.B)
 
     @property
     def T_variance(self):
@@ -395,7 +395,7 @@ class LinearAutonomousPoolModel(object):
             :func:`.phase_type.variance`: Return the (symbolic) variance of 
             the phase-type distribution.
         """
-        return phase_type.variance(self.beta, self.A)
+        return phase_type.variance(self.beta, self.B)
 
     def T_nth_moment(self, n):
         """Return the (symbolic) ``n`` th moment of the transit time.
@@ -410,7 +410,7 @@ class LinearAutonomousPoolModel(object):
             :func:`.phase_type.nth_moment`: Return the (symbolic) ``n`` th 
             moment of the phase-type distribution.
         """
-        return phase_type.nth_moment(self.beta, self.A, n)
+        return phase_type.nth_moment(self.beta, self.B, n)
 
     def T_quantile(self, q, tol=1e-8):
         """Return a numerical quantile of the transit time distribution.
@@ -452,7 +452,7 @@ class LinearAutonomousPoolModel(object):
     
         Returns:
             SymPy expression or numerical value: cumulative distribution 
-            function of PH(:math:`\\eta`, :math:`A`)
+            function of PH(:math:`\\eta`, :math:`B`)
             (evaluated at age)
 
         See Also:
@@ -461,7 +461,7 @@ class LinearAutonomousPoolModel(object):
         """ 
         Qt = self._get_Qt(age)
         t, y = symbols('t y')
-        return phase_type.cum_dist_func(self.eta, self.A, Qt).subs({t:y})
+        return phase_type.cum_dist_func(self.eta, self.B, Qt).subs({t:y})
     
     def A_density(self, age=None): 
         """Return the probability density function of the system age.
@@ -473,7 +473,7 @@ class LinearAutonomousPoolModel(object):
     
         Returns:
             SymPy expression or numerical value: probability density function 
-            of PH(:math:`\\eta`, :math:`A`) (evaluated at age)
+            of PH(:math:`\\eta`, :math:`B`) (evaluated at age)
 
         See Also:
             :func:`.phase_type.density`: Return the (symbolic) probability 
@@ -481,7 +481,7 @@ class LinearAutonomousPoolModel(object):
         """ 
         Qt = self._get_Qt(age)
         t, y = symbols('t y')
-        return phase_type.density(self.eta, self.A, Qt).subs({t:y})
+        return phase_type.density(self.eta, self.B, Qt).subs({t:y})
     
     @property
     def A_expected_value(self): 
@@ -489,14 +489,14 @@ class LinearAutonomousPoolModel(object):
 
         Returns:
             SymPy expression or numerical value: expected value of 
-            PH(:math:`\\eta`, :math:`A`) 
+            PH(:math:`\\eta`, :math:`B`) 
 
         See Also:
             :obj:`.phase_type.expected_value`: Return the (symbolic) expected 
             value of the phase-type distribution.
         """
         t, y = symbols('t y')
-        return phase_type.expected_value(self.eta, self.A).subs({t:y})
+        return phase_type.expected_value(self.eta, self.B).subs({t:y})
     
     @property
     def A_standard_deviation(self): 
@@ -504,13 +504,13 @@ class LinearAutonomousPoolModel(object):
 
         Returns:
             SymPy expression or numerical value: standard deviation of 
-            PH(:math:`\\eta`, :math:`A`) 
+            PH(:math:`\\eta`, :math:`B`) 
 
         See Also:
             :func:`.phase_type.standard_deviation`: Return the (symbolic) 
             standard deviation of the phase-type distribution.
         """
-        return phase_type.standard_deviation(self.eta, self.A)
+        return phase_type.standard_deviation(self.eta, self.B)
 
     @property
     def A_variance(self):
@@ -518,13 +518,13 @@ class LinearAutonomousPoolModel(object):
 
         Returns:
             SymPy expression or numerical value: variance of 
-            PH(:math:`\\eta`, :math:`A`) 
+            PH(:math:`\\eta`, :math:`B`) 
 
         See Also:
             func:`.phase_type.variance`: Return the (symbolic) variance of the 
             phase-type distribution.
         """
-        return phase_type.variance(self.eta, self.A)
+        return phase_type.variance(self.eta, self.B)
 
     def A_nth_moment(self, n):
         """Return the (symbolic) ``n`` th moment of the system age.
@@ -534,13 +534,13 @@ class LinearAutonomousPoolModel(object):
 
         Returns:
             SymPy expression or numerical value: ``n`` th moment of 
-            PH(:math:`\\eta`, :math:`A`) 
+            PH(:math:`\\eta`, :math:`B`) 
 
         See Also:
             :func:`.phase_type.nth_moment`: Return the (symbolic) ``n`` th 
             moment of the phase-type distribution.
         """
-        return phase_type.nth_moment(self.eeta, self.A, n)
+        return phase_type.nth_moment(self.eeta, self.B, n)
 
     def A_quantile(self, q, tol=1e-8):
         """Return a numerical quantile of the system age distribution.
@@ -586,12 +586,12 @@ class LinearAutonomousPoolModel(object):
     
         Returns:
             SymPy or numerical dx1-matrix: :math:`F_a` (evaluated at age) 
-                :math:`F_a(y) = (X^\\ast)^{-1}\\,A^{-1}\\,`
-                :math:`(e^{y\\,A}-I)\\,u`
+                :math:`F_a(y) = (X^\\ast)^{-1}\\,B^{-1}\\,`
+                :math:`(e^{y\\,B}-I)\\,u`
         """ 
         Qt = self._get_Qt(age)
         t, y = symbols('t y')
-        return _age_vector_cum_dist(self.u, self.A, Qt).subs({t:y})
+        return _age_vector_cum_dist(self.u, self.B, Qt).subs({t:y})
 
     def a_density(self, age=None): 
         """Return the probability density function vector of the 
@@ -605,11 +605,11 @@ class LinearAutonomousPoolModel(object):
         Returns:
             SymPy or numerical dx1-matrix: :math:`f_a` (evaluated at age) 
                 :math:`f_a(y) = (X^\\ast)^{-1}\\,`
-                :math:`e^{y\\,A}\\,u`
+                :math:`e^{y\\,B}\\,u`
         """ 
         Qt = self._get_Qt(age)
         t, y = symbols('t y')
-        return _age_vector_dens(self.u, self.A, Qt).subs({t:y})
+        return _age_vector_dens(self.u, self.B, Qt).subs({t:y})
 
     @property
     def a_expected_value(self): 
@@ -619,10 +619,10 @@ class LinearAutonomousPoolModel(object):
         Returns:
             SymPy dx1-matrix:
             :math:`\\mathbb{E}[a] = -(X^\\ast)^{-1}\\,`
-            :math:`A^{-1}\\,x^\\ast`
+            :math:`B^{-1}\\,x^\\ast`
         """
         t, y = symbols('t y')
-        return _age_vector_exp(self.u, self.A)
+        return _age_vector_exp(self.u, self.B)
 
     @property
     def a_standard_deviation(self): 
@@ -633,7 +633,7 @@ class LinearAutonomousPoolModel(object):
             SymPy dx1-matrix:
             :math:`\\sigma(a) = \\sqrt{\\sigma^2(a)}` component-wise
         """
-        return _age_vector_sd(self.u, self.A)
+        return _age_vector_sd(self.u, self.B)
 
     @property
     def a_variance(self):
@@ -644,7 +644,7 @@ class LinearAutonomousPoolModel(object):
             :math:`\\sigma^2(a) = \\mathbb{E}[a^2]`
             :math:`- (\\mathbb{E}[a])^2` component-wise
         """
-        return _age_vector_variance(self.u, self.A)
+        return _age_vector_variance(self.u, self.B)
 
     def a_nth_moment(self, n):
         """Return the (symbolic) vector of the ``n`` th moments of the 
@@ -656,9 +656,9 @@ class LinearAutonomousPoolModel(object):
         Returns:
             SymPy or numerical dx1-matrix:
             :math:`\\mathbb{E}[a^n] = (-1)^n\\,n!\\,(X^\\ast)^{-1}`
-            :math:`\\ ,A^{-n}\\,x^\\ast`
+            :math:`\\ ,B^{-n}\\,x^\\ast`
         """
-        return _age_vector_nth_moment(self.beta, self.A, n)
+        return _age_vector_nth_moment(self.beta, self.B, n)
 
 
     def a_quantile(self, q, tol=1e-8):
@@ -681,7 +681,7 @@ class LinearAutonomousPoolModel(object):
             :func:`a_cum_dist_func`: Return the cumulative distribution function
             vector of the compartment ages.
         """
-        d = self.A.rows
+        d = self.B.rows
         res = np.nan * np.zeros(d)
         try:
             for pool in range(d):
@@ -701,13 +701,13 @@ class LinearAutonomousPoolModel(object):
 
         Returns:
             SymPy expression: Laplace transform of the probability density of 
-            PH(:math:`\\beta`, :math:`A`) 
+            PH(:math:`\\beta`, :math:`B`) 
 
         See Also:
             :obj:`.phase_type.laplace`: Return the symbolic Laplacian of the 
             phase-type distribtion.
         """
-        return simplify(phase_type.laplace(self.beta, self.A))
+        return simplify(phase_type.laplace(self.beta, self.B))
     
     @property
     def A_laplace(self): 
@@ -715,13 +715,13 @@ class LinearAutonomousPoolModel(object):
 
         Returns:
             SymPy expression: Laplace transform of the probability density of 
-            PH(:math:`\\eta`, :math:`A`) 
+            PH(:math:`\\eta`, :math:`B`) 
 
         See Also:
             :obj:`.phase_type.laplace`: Return the symbolic Laplacian of the 
             phase-type distribtion.
         """
-        return simplify(phase_type.laplace(self.eta, self.A))
+        return simplify(phase_type.laplace(self.eta, self.B))
 
 
     # release
@@ -738,8 +738,8 @@ class LinearAutonomousPoolModel(object):
                 toward absorbing state.
             | :obj:`xss`: Return the (symbolic) steady state vector.
         """
-        r = phase_type.z(self.A)
-        return Matrix(self.xss.rows, 1, [phase_type.z(self.A)[i]*self.xss[i] 
+        r = phase_type.z(self.B)
+        return Matrix(self.xss.rows, 1, [phase_type.z(self.B)[i]*self.xss[i] 
                                             for i in range(self.xss.rows)])
 
     @property
@@ -760,18 +760,18 @@ class LinearAutonomousPoolModel(object):
     def absorbing_jump_chain(self):
         """Return the absorbing jump chain as a discrete-time Markov chain.
 
-        The generator of the absorbing chain is just given by :math:`A`, which
+        The generator of the absorbing chain is just given by :math:`B`, which
         allows the computation of the transition probability matrix :math:`P` 
-        from :math:`A=(P-I)\\,D` with :math:`D` being the diagonal matrix with
-        diagonal entries taken from :math:`-A`.
+        from :math:`B=(P-I)\\,D` with :math:`D` being the diagonal matrix with
+        diagonal entries taken from :math:`-B`.
 
         Returns:
             :class:`~.DTMC.DTMC`: :class:`DTMC` (beta, P)
         """
-        # A = (P - I) * D
-        d = self.A.rows
-        D = diag(*[-self.A[j,j] for j in range(d)])
-        P = self.A * D**(-1) + eye(d)
+        # B = (P - I) * D
+        d = self.B.rows
+        D = diag(*[-self.B[j,j] for j in range(d)])
+        P = self.B * D**(-1) + eye(d)
     
         return DTMC(self.beta, P)
 
@@ -783,7 +783,7 @@ class LinearAutonomousPoolModel(object):
 
         .. math::
             Q = \\begin{pmatrix} 
-                    A & \\beta \\\\ 
+                    B & \\beta \\\\ 
                     z^T & -1 
                 \\end{pmatrix}
 
@@ -795,19 +795,19 @@ class LinearAutonomousPoolModel(object):
            :class:`~.DTMC.DTMC`: :class:`DTMC` (beta_ext, Q) with 
            beta_ext = (beta, 0)
         """
-        A = self.A
-        d = A.rows
+        B = self.B
+        d = B.rows
     
         lor = []
         for i in range(d):
-            row = list(A[i,:]) + [self.beta[i]]
+            row = list(B[i,:]) + [self.beta[i]]
             lor.append(row)
     
-        row = list(phase_type.z(A)) + [-1]
+        row = list(phase_type.z(B)) + [-1]
         lor.append(row)
     
         # (d+1)x(d+1) matrix
-        # A     beta
+        # B     beta
         # z^T     -1
         Q = lor
         
@@ -837,7 +837,7 @@ class LinearAutonomousPoolModel(object):
             SymPy expression or float: :math:`\\theta_J=`
             :math:`\\sum\\limits_{j=1}^{d+1} \\pi_j` 
             :math:`\\sum\\limits_{i=1}^{d+1}-p_{ij}\\,\\log p_{ij}`
-            :math:`+\\sum\\limits_{j=1}^d \\pi_j\\,(1-\\log -a_{jj})` 
+            :math:`+\\sum\\limits_{j=1}^d \\pi_j\\,(1-\\log -b_{jj})` 
             :math:`+\\pi_{d+1}\\,\\sum\\limits_{i=1}^d`
             :math:`-\\beta_i\\,\\log\\beta_i`
 
@@ -852,7 +852,7 @@ class LinearAutonomousPoolModel(object):
             :obj:`~.DTMC.DTMC.stationary_distribution`: 
             Return the (symbolic) stationary distribution.
         """
-        d = self.A.rows
+        d = self.B.rows
         P = self.ergodic_jump_chain.P
         pi = self.ergodic_jump_chain.stationary_distribution
     
@@ -867,7 +867,7 @@ class LinearAutonomousPoolModel(object):
                 x += 0
             else:
                 # differential entropy of exponential distribution
-                x += (1-log(-self.A[j,j]))
+                x += (1-log(-self.B[j,j]))
             x *= pi[j]
             theta_stays += x
 

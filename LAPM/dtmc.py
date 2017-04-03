@@ -42,10 +42,10 @@ class DTMC(object):
     
         Returns:
             SymPy or numerical dxd-matrix: 
-                :math:`\\bf{M}=(\\bf{I}-\\bf{P})^{-1}`
+                :math:`M=(I-P)^{-1}`
 
         Raises:
-            Error: if :math:`\\operatorname{det}(\\bf{I}-\\bf{P})=0`,
+            Error: if :math:`\\operatorname{det}(I-P)=0`,
                    no absorbing Markov chain is given
         """
         try:
@@ -62,14 +62,14 @@ class DTMC(object):
 
         Returns:
             SymPy expression or numerical value: 
-                :math:`\\sum\\limits_{i=1}^n [\\bf{M}\\,\\bf{\\beta}]_i`
+                :math:`\\sum\\limits_{i=1}^n [M\\,\\beta]_i`
 
         See Also:
             :func:`fundamental_matrix`: 
             Return the (symbolic) fundamental matrix.
 
         Raises:
-            Error: if :math:`\\operatorname{det}(\\bf{I}-\\bf{P})=0`,
+            Error: if :math:`\\operatorname{det}(I-P)=0`,
                    no absorbing Markov chain is given
         """
         n = self.n

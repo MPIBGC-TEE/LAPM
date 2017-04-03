@@ -3,7 +3,7 @@ Linear Autonomous Pool Models (LAPM)
 
 `LAPM <https://github.com/MPIBGC-TEE/LAPM>`_ is a simple Python package to deal with linear autonomous pool models of the form
 
-.. math:: \frac{d}{dt}\,x(t) = A\,x(t) + u.
+.. math:: \frac{d}{dt}\,x(t) = B\,x(t) + u.
 
 It provides symbolic and numerical computation of
 
@@ -37,11 +37,11 @@ Table of Contents
 Important Note
 --------------
 
-:math:`\bf{A}=(a_{ij})` has always to be an invertible *compartmental matrix*:
+:math:`\bf{B}=(b_{ij})` has always to be an invertible *compartmental matrix*:
 
-* :math:`a_{ii}<0` for all :math:`i`
-* :math:`a_{ij}\geq 0` for :math:`i\neq j`
-* :math:`\sum\limits_{i=1}^d a_{ij}\leq 0` for all :math:`j`
+* :math:`b_{ii}<0` for all :math:`i`
+* :math:`b_{ij}\geq 0` for :math:`i\neq j`
+* :math:`\sum\limits_{i=1}^d b_{ij}\leq 0` for all :math:`j`
 
 
 ---------------------------
