@@ -187,6 +187,9 @@ class Error(Exception):
     """Generic error occuring in this module."""
     pass
 
+class NonInvertibleCompartmentalMatrix(Exception):
+    pass
+
 
 class LinearAutonomousPoolModel(object):
     """General class of linear autonomous compartment models.
@@ -219,7 +222,7 @@ class LinearAutonomousPoolModel(object):
 
     def __init__(self, u, B, force_numerical=False):
         """Return a linear autonomous compartment model with external 
-        inputs u and compartment matrix B.
+        inputs u and (invertible) compartment matrix B.
 
         Symbolical computations can take very long, in particular
         for complicated systems. An enforced purely numerical
@@ -227,17 +230,34 @@ class LinearAutonomousPoolModel(object):
 
         Args:
             u (SymPy dx1-matrix): external input vector
-            B (SymPy dxd-matrix): compartment matrix
+            B (SymPy dxd-matrix): invertible compartment matrix
             force_numerical (boolean, optional): 
                 if True do not try symbolical computations,
                 defaults to False
+
+        Remark:
+            While there are compartmental 
+            systems that have singular matrices (systems with traps), most of the 
+            methods of this class are only correct for invertible B. 
+            We therefore reject singular matrices alltogether.
         """
         # cover one-dimensional input
         if (not hasattr(u, 'is_Matrix')) or (not u.is_Matrix): 
             u = Matrix(1, 1, [u])
         if (not hasattr(B, 'is_Matrix')) or (not B.is_Matrix): 
             B = Matrix(1, 1, [B])
-    
+   
+        try:
+            B**-1
+        except ValueError as e:
+            raise NonInvertibleCompartmentalMatrix("""
+            The matrix B is not invertible. 
+            While there are compartmental systems that have singular matrices 
+            (systems with traps), most of the methods of this class are only 
+            correct for invertible B. 
+            We therefore reject singular matrices alltogether.
+            """)
+
         self.B = B
         self.u = u  
 

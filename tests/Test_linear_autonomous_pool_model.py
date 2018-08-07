@@ -6,11 +6,21 @@ import sys
 import numpy as np
 from sympy import Matrix, symbols, zeros, log
 
-from LAPM.linear_autonomous_pool_model import LinearAutonomousPoolModel, Error
+from LAPM.linear_autonomous_pool_model import LinearAutonomousPoolModel, Error,NonInvertibleCompartmentalMatrix
 from LAPM.example_models import TwoPoolsNoFeedback
 
 
 class TestLinearAutonmousPoolModel(unittest.TestCase):
+
+    def test_init(self):
+        # - check that a singular matrix is rejected
+        # two pools, parallel
+        u = Matrix(2, 1, [1, 1])
+        lamda = symbols('lamda')
+        B = Matrix([[    -0,      0],
+                    [     0, -lamda]])
+        with self.assertRaises(NonInvertibleCompartmentalMatrix) as e: 
+            M = LinearAutonomousPoolModel(u, B)
 
     def test_absorbing_jump_chain(self):
         M = TwoPoolsNoFeedback(0, 1, 1)
