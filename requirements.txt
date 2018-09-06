@@ -1,2 +1,2 @@
--e git://github.com/MPIBGC-TEE/sphinx-repaired#egg=Sphinx
+-e git://github.com/MPIBGC-TEE/testinfrastructure#egg=testinfrastructure
 
