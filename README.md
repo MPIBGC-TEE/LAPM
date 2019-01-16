@@ -14,7 +14,7 @@ module.
 
 ---
 
-Installation simply via the install script `install.sh install`.
+Installation simply via the install script `install.sh`.
 Use either `develop` or `install` as additional parameter, it will be 
 passed to the `python3 setup.py` call.
 
