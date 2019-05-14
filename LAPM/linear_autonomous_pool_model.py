@@ -246,7 +246,7 @@ class LinearAutonomousPoolModel(object):
             u = Matrix(1, 1, [u])
         if (not hasattr(B, 'is_Matrix')) or (not B.is_Matrix): 
             B = Matrix(1, 1, [B])
-   
+  
         try:
             B**-1
         except ValueError as e:
