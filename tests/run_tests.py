@@ -10,9 +10,6 @@ import sys
 from pathlib import Path
 
 def main():
-    p = Path(__file__).absolute().parents[2]
-    sys.path.append(p.as_posix())
-
     print("\n###################### running tests ##########################\n")
 
     s = unittest.defaultTestLoader.discover('', pattern="Test*")
