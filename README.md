@@ -1,3 +1,4 @@
+[![Travis-CI Build Status](https://travis-ci.org/MPIBGC-TEE/LAPM.svg?branch=master)](https://travis-ci.org/MPIBGC-TEE/LAPM)
 # LAPM: Linear Autonomous Pool Models
 
 This is a Python3 package for linear autonomous pool models.
