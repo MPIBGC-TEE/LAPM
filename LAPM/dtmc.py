@@ -98,10 +98,12 @@ class DTMC(object):
 
         # solve the system
         sol = solve(Eq(P_extended*nu, v), nu)
+        #print('sol', sol)
     
         if sol == []: return None
 
         # make a vector out of dictionary solution
+        #print(nu)
         l = [sol[x] for x in nu]
         return Matrix(l)
 
