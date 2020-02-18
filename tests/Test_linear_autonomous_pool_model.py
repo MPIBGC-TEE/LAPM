@@ -46,7 +46,7 @@ class TestLinearAutonmousPoolModel(unittest.TestCase):
         B = Matrix([[-lamda]])
         M = LinearAutonomousPoolModel(u, B)
         ref = 1/2*(1-log(lamda))
-        self.assertEqual(M.entropy_per_jump, ref)
+        self.assertEqual(M.entropy_per_jump-ref,0)
 
         # two pools, serial
         u = Matrix(2, 1, [1, 0])
@@ -55,7 +55,7 @@ class TestLinearAutonmousPoolModel(unittest.TestCase):
                     [ lamda, -lamda]])
         M = LinearAutonomousPoolModel(u, B)
         ref = 1/3*(1-log(lamda))*2
-        self.assertEqual(M.entropy_per_jump, ref)
+        self.assertEqual(M.entropy_per_jump-ref,0)
 
         # two pools, parallel
         u = Matrix(2, 1, [1, 1])
@@ -64,7 +64,7 @@ class TestLinearAutonmousPoolModel(unittest.TestCase):
                     [     0, -lamda]])
         M = LinearAutonomousPoolModel(u, B)
         ref = 1/4*(1-log(lamda))*2 + 1/2*log(2)
-        self.assertEqual(M.entropy_per_jump, ref)
+        self.assertEqual(M.entropy_per_jump-ref,0)
 
     def test_entropy_per_cycle(self):
         # one pool
@@ -73,7 +73,7 @@ class TestLinearAutonmousPoolModel(unittest.TestCase):
         B = Matrix([[-lamda]])
         M = LinearAutonomousPoolModel(u, B)
         ref = 1/2*(1-log(lamda))*1 * 2
-        self.assertEqual(M.entropy_per_cycle, ref)
+        self.assertEqual(M.entropy_per_cycle-ref,0)
 
         # two pools, serial
         u = Matrix(2, 1, [1, 0])
@@ -82,7 +82,7 @@ class TestLinearAutonmousPoolModel(unittest.TestCase):
                     [ lamda, -lamda]])
         M = LinearAutonomousPoolModel(u, B)
         ref = 1/3*(1-log(lamda))*2 * 3
-        self.assertEqual(M.entropy_per_cycle, ref)
+        self.assertEqual(M.entropy_per_cycle-ref,0)
 
         # two pools, parallel
         u = Matrix(2, 1, [1, 1])
@@ -91,7 +91,7 @@ class TestLinearAutonmousPoolModel(unittest.TestCase):
                     [     0, -lamda]])
         M = LinearAutonomousPoolModel(u, B)
         ref = (1/4*(1-log(lamda))*2 + 1/2*log(2)) * 2
-        self.assertEqual(M.entropy_per_cycle, ref)
+        self.assertEqual(M.entropy_per_cycle-ref,0)
 
     def test_entropy_rate(self):
         # one pool

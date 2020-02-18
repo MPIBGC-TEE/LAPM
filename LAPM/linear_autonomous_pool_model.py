@@ -30,10 +30,10 @@ def _age_vector_dens(u, B, Qt):
         SymPy dx1-matrix: probability density vector of the compartment ages
         :math:`f_a(y) = (X^\\ast)^{-1}\\,e^{y\\,B}\\,u`
     """
-    xss = -(B**-1)*u
+    xss = -B.inv()*u
     X = diag(*xss)
     
-    return (X**-1)*Qt*u
+    return X.inv()*Qt*u
 
 
 def _age_vector_cum_dist(u, B, Qt):
@@ -52,10 +52,10 @@ def _age_vector_cum_dist(u, B, Qt):
         :math:`f_a(y)=(X^\\ast)^{-1}\\,B^{-1}\\,(e^{y\\,B}-I)\\,u`
     """
     d = B.rows
-    xss = -(B**-1)*u
+    xss = -B.inv()*u
     X = diag(*xss)
 
-    return (X**-1)*(B**-1)*(Qt-eye(d))*u
+    return X.inv()*B.inv()*(Qt-eye(d))*u
 
 
 def _age_vector_nth_moment(u, B, n):
@@ -74,10 +74,10 @@ def _age_vector_nth_moment(u, B, n):
         :func:`_age_vector_exp`: Return the (symbolic) vector of expected values
         of the compartment ages.
     """
-    xss = -(B**-1)*u
+    xss = -B.inv()*u
     X = diag(*xss)
 
-    return (-1)**n*factorial(n)*(X**-1)*(B**-n)*xss
+    return (-1)**n*factorial(n)*X.inv()*(B.inv()**n)*xss
 
 
 def _age_vector_exp(u, B):
@@ -248,7 +248,7 @@ class LinearAutonomousPoolModel(object):
             B = Matrix(1, 1, [B])
    
         try:
-            B**-1
+            B.inv()
         except ValueError as e:
             raise NonInvertibleCompartmentalMatrix("""
             The matrix B is not invertible. 
@@ -331,7 +331,7 @@ class LinearAutonomousPoolModel(object):
             SymPy or numerical dx1-matrix: 
                 :math:`x^\\ast = -B^{-1}\\,u`
         """
-        return -(self.B**-1)*self.u
+        return -self.B.inv()*self.u
     
     @property
     def eta(self): 

@@ -75,7 +75,7 @@ def nth_moment(beta, B, n):
             :math:`(-1)^n\\,n!\\,\\mathbf{1}^T\\,B^{-1}\\,\\beta`
     """
     o = ones(1, B.cols)
-    return ((-1)**n*factorial(n)*o*(B**-n)*beta)[0]
+    return ((-1)**n*factorial(n)*o*(B.inv()**n)*beta)[0]
 
 def variance(beta, B):
     """Return the (symbolic) variance of the phase-type distribution.
@@ -155,7 +155,7 @@ def laplace(beta, B):
     """
     s = symbols('s')
     
-    return (z(B).transpose()*((s*eye(B.rows)-B)**-1)*beta)[0]
+    return (z(B).transpose()*(  (s*eye(B.rows)-B).inv() )*beta)[0]
 
 
 
