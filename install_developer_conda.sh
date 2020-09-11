@@ -1,2 +1,2 @@
-conda install --file -f requirements.developer
+conda install -y --file requirements.developer
 python setup.py develop

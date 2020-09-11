@@ -304,7 +304,7 @@ class LinearAutonomousPoolModel(object):
                 # purely numerical calculation
                 B = self.B
                 D = np.array([[B[i,j] for j in range(B.cols)] 
-                        for i in range(B.rows)], dtype='float32') * float(x)
+                        for i in range(B.rows)], dtype='float64') * float(x)
                 Qt = expm(D)
 
         return Qt
