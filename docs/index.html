@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Linear Autonomous Pool Models (LAPM) &#8212; LAPM 1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="LAPM.phase_type" href="_autosummary/LAPM.phase_type.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="linear-autonomous-pool-models-lapm">
+<h1>Linear Autonomous Pool Models (LAPM)<a class="headerlink" href="#linear-autonomous-pool-models-lapm" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://github.com/MPIBGC-TEE/LAPM">LAPM</a> is a simple Python package to deal with linear autonomous pool models of the form</p>
+<div class="math notranslate nohighlight">
+\[\frac{d}{dt}\,x(t) = B\,x(t) + u.\]</div>
+<p>It provides symbolic and numerical computation of</p>
+<ul>
+<li><p>steady state content</p></li>
+<li><p>steady state release</p></li>
+<li><p>transit time, system age, pool age</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>density</p></li>
+<li><p>(cumulative distribution function)</p></li>
+<li><p>mean</p></li>
+<li><p>standard deviation</p></li>
+<li><p>variance</p></li>
+<li><p>higher order moments</p></li>
+<li><p>(Laplace transforms)</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<div class="section" id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/LAPM.phase_type.html#module-LAPM.phase_type" title="LAPM.phase_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">phase_type</span></code></a></p></td>
+<td><p>Module for phase-type distribution.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/LAPM.linear_autonomous_pool_model.html#module-LAPM.linear_autonomous_pool_model" title="LAPM.linear_autonomous_pool_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linear_autonomous_pool_model</span></code></a></p></td>
+<td><p>Module for linear autonomous pool models.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/LAPM.dtmc.html#module-LAPM.dtmc" title="LAPM.dtmc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dtmc</span></code></a></p></td>
+<td><p>Module for discrete-time Markov chains (DTMCs).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/LAPM.example_models.html#module-LAPM.example_models" title="LAPM.example_models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">example_models</span></code></a></p></td>
+<td><p>Example linear autonomous pool models.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/LAPM.emanuel.html#module-LAPM.emanuel" title="LAPM.emanuel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">emanuel</span></code></a></p></td>
+<td><p>Example: Emanuel’s model</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<div class="section" id="important-note">
+<h2>Important Note<a class="headerlink" href="#important-note" title="Permalink to this headline">¶</a></h2>
+<p><span class="math notranslate nohighlight">\(\bf{B}=(b_{ij})\)</span> has always to be an invertible <em>compartmental matrix</em>:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(b_{ii}&lt;0\)</span> for all <span class="math notranslate nohighlight">\(i\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(b_{ij}\geq 0\)</span> for <span class="math notranslate nohighlight">\(i\neq j\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\sum\limits_{i=1}^d b_{ij}\leq 0\)</span> for all <span class="math notranslate nohighlight">\(j\)</span></p></li>
+</ul>
+</div>
+<hr class="docutils" />
+<div class="section" id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">LAPM</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_autosummary/LAPM.phase_type.html">LAPM.phase_type</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_autosummary/LAPM.linear_autonomous_pool_model.html">LAPM.linear_autonomous_pool_model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_autosummary/LAPM.dtmc.html">LAPM.dtmc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_autosummary/LAPM.example_models.html">LAPM.example_models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_autosummary/LAPM.emanuel.html">LAPM.emanuel</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="_autosummary/LAPM.phase_type.html" title="next chapter">LAPM.phase_type</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Holger Metzler.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
