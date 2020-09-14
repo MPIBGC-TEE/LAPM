@@ -11,8 +11,8 @@ module.
 
 ---
 
-[Documentation](http://lapm.readthedocs.io/en/latest/)
-
+<!--[Documentation](http://lapm.readthedocs.io/en/latest/)-->
+[Documentation](https://mpibgc-tee.github.io/LAPM/).
 ---
 
 Installation simply via the install script `install.sh`.
