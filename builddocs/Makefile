@@ -21,7 +21,7 @@ help:
 .PHONY: clean
 clean:
 	rm -rf $(BUILDDIR)/*
-	rm -rf $(AUTOSUMMARYDIR)/*
+	rm -rf $(SOURCEDIR)/$(AUTOSUMMARYDIR)/*
 
 .PHONY: html
 html:
