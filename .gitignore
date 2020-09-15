@@ -1,5 +1,5 @@
 LAPM/__pycache__/
-docs/_build/
+builddocs/_build/
 src/LAPM.egg-info/*
 *.pyc
 

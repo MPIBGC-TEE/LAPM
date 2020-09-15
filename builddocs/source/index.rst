@@ -23,6 +23,7 @@ Table of Contents
 -----------------
 
 .. autosummary::
+    :template: autosummary/module.rst
     :toctree: _autosummary
 
     ~LAPM.phase_type
