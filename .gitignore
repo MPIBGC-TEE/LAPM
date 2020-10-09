@@ -2,5 +2,6 @@ LAPM/__pycache__/
 builddocs/_build/
 builddocs/source/_autosummary/*
 src/LAPM.egg-info/*
+LAPM.egg-info/*
 *.pyc
 
