@@ -3,7 +3,7 @@
 # this is a pure python version 
 # run with pyhton3 run_tests.py in a venv
 
-from concurrencytest import ConcurrentTestSuite, fork_for_tests
+#from concurrencytest import ConcurrentTestSuite, fork_for_tests
 import unittest
 import sys
 
@@ -13,10 +13,11 @@ def main():
     print("\n###################### running tests ##########################\n")
 
     s = unittest.defaultTestLoader.discover('', pattern="Test*")
-    concurrent_suite = ConcurrentTestSuite(s, fork_for_tests(16))
+#    concurrent_suite = ConcurrentTestSuite(s, fork_for_tests(16))
     r = unittest.TextTestRunner()
 
-    res = r.run(concurrent_suite)
+#    res = r.run(concurrent_suite)
+    res = r.run(s)
     if len(res.errors) + len(res.failures) > 0:
         sys.exit(1)
 
