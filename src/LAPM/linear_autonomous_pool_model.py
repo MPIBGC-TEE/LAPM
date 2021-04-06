@@ -260,12 +260,10 @@ class LinearAutonomousPoolModel(object):
 
         self.B = B
         self.u = u  
-
         # compute matrix exponential if no symbols are involved
         if (not force_numerical) and ((B.is_Matrix) and (len(B.free_symbols) == 0)):
             t = symbols('t')
             self.Qt = exp(t*B)
-
     # private methods
 
     def _get_Qt(self, x):
