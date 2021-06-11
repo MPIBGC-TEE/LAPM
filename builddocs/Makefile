@@ -26,7 +26,7 @@ clean:
 
 .PHONY: api-doc
 api-doc:
-	sphinx-apidoc -o $(SOURCEDIR)/ --ext-autodoc $(MODULESDIR)
+	sphinx-apidoc -o $(SOURCEDIR)/ --ext-autodoc $(MODULESDIR) --module-first --separate
 
 .PHONY: html
 html:

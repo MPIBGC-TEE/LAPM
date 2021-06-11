@@ -5,7 +5,7 @@
    :members:
    :inherited-members:
    :show-inheritance:
-
+    
    {% block functions %}
    {% if functions %}
    .. rubric:: Functions
@@ -38,3 +38,7 @@
    {%- endfor %}
    {% endif %}
    {% endblock %}
+
+   Detailed module content
+   -----------------------
+
