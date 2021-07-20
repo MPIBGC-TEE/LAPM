@@ -1,2 +1,2 @@
-call conda install -y --file requirements.developer
+call conda install -c conda-forge -y --file requirements.developer
 call python setup.py develop
