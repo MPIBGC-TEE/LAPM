@@ -180,6 +180,61 @@ def _generalized_inverse_CDF(CDF, u, start_dist=1e-4, tol=1e-8):
     return res
 
 
+def create_random_vector(d: int, p: float) -> np.ndarray:
+    """Create a random vector.
+    
+    Args:
+        d: dimension of the random vector
+        p: probability of setting elements to nonzero value
+        
+    Returns:
+        random vector `v` s.t.
+        - :math:`v_i \geq 0`
+        - :math:`\mathbb{P}(v_i>0) = p`
+        - :math:`\sum_i v_i=1`
+    """
+    while True:
+        v = np.random.binomial(1, p, d)
+        v = v * np.random.uniform(0, 1, d)
+        if v.sum():
+            v = v / v.sum()
+            return np.random.permutation(v)
+
+
+def create_random_compartmental_matrix(d: int, p: float, D: np.ndarray = None) -> np.ndarray:
+    """Create a random compartmental matrix.
+    
+    Args:
+        d: dimension of the matrix (number of pools)
+        p: probability of having a connection between two pools
+        D: optional, compartment speed vector (`-diag(B)`), if not
+            provided, entries will be drawn uniformly from [0, 1]
+        
+    Returns:
+        compartmental matrix `B` s.t.
+        - all diagonal entries are nonpositive
+        - all off-diagonal entries are nonnegative
+        - all column sums are nonpositive
+        - :math:`B` is invertible
+        - :math:`-B_{ii} <= 1` (if `D` not provided, mean sojourn time)
+        - :math:`\mathbb{P}(B_{ij}>0) = p` for :math:`i \neq j`
+        - :math:`\mathbb{P}(z_j)>0) = p`, where :math:`z_j = -\sum_i B_{ij}`
+    """
+    while True:
+        V = np.array([create_random_vector(d, p) for _ in range(d)])
+        if D is None:
+            D = np.random.uniform(0, 1, d)
+        
+        B = -np.diag(D)
+        for j in range(d):
+            B[:, j] = D * V[:, j]
+            B[j, j] = -B[:, j].sum()
+        
+        if np.linalg.det(B):
+#            print("XXX", np.linalg.det(B))
+            return B
+
+
 ############################################################################
 
 
@@ -264,6 +319,30 @@ class LinearAutonomousPoolModel(object):
         if (not force_numerical) and ((B.is_Matrix) and (len(B.free_symbols) == 0)):
             t = symbols('t')
             self.Qt = exp(t*B)
+
+    @classmethod
+    def from_random(cls, d: int, p: float, D: np.ndarray = None):
+        """Create a random compartmental system.
+
+    
+        Args:
+            d: dimension of the matrix (number of pools)
+            p: probability of having a connection between two pools
+                and of nonzero value in input vector
+            D: optional, compartment speed vector (`-diag(B)`), if not
+                provided, entries will be drawn uniformly from [0, 1]
+        
+        Returns:
+            randomly generated compartmental system
+            
+            - `beta`: from :func:`create_random_vector`
+            - `B: from :func:`~create_random_compartmental_matrix
+        """
+        beta = Matrix(create_random_vector(d, p))
+        B = Matrix(create_random_compartmental_matrix(d, p, D))
+        
+        return cls(beta, B, force_numerical=True)
+
     # private methods
 
     def _get_Qt(self, x):

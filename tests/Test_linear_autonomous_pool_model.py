@@ -6,7 +6,7 @@ import sys
 import numpy as np
 from sympy import Matrix, symbols, zeros, log
 
-from LAPM.linear_autonomous_pool_model import LinearAutonomousPoolModel, Error,NonInvertibleCompartmentalMatrix
+from LAPM.linear_autonomous_pool_model import LinearAutonomousPoolModel, Error, NonInvertibleCompartmentalMatrix
 from LAPM.example_models import TwoPoolsNoFeedback
 
 
@@ -21,6 +21,15 @@ class TestLinearAutonmousPoolModel(unittest.TestCase):
                     [     0, -lamda]])
         with self.assertRaises(NonInvertibleCompartmentalMatrix) as e: 
             M = LinearAutonomousPoolModel(u, B)
+
+    def test_from_random(self):
+        d = 3
+        p = 0.5
+        M = LinearAutonomousPoolModel.from_random(d, p)
+        self.assertTrue(isinstance(M, LinearAutonomousPoolModel))
+        self.assertTrue(np.all(np.array(M.u).astype(float) >= 0))
+        print(sum(M.u))
+        self.assertTrue(sum(M.u) - 1 == 0)
 
     def test_absorbing_jump_chain(self):
         M = TwoPoolsNoFeedback(0, 1, 1)
