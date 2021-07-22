@@ -24,7 +24,8 @@ Table of Contents
 
 .. autosummary::
     :template: autosummary/module.rst
-    :toctree: _autosummary
+    :toctree:
+    :recursive:
 
     ~LAPM.phase_type
     ~LAPM.linear_autonomous_pool_model

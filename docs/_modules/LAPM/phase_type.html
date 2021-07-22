@@ -6,14 +6,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LAPM.phase_type &#8212; LAPM 1 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -50,7 +48,7 @@
 <span class="c1">#########################</span>
 
 
-<div class="viewcode-block" id="z"><a class="viewcode-back" href="../../LAPM.html#LAPM.phase_type.z">[docs]</a><span class="k">def</span> <span class="nf">z</span><span class="p">(</span><span class="n">B</span><span class="p">):</span>
+<div class="viewcode-block" id="z"><a class="viewcode-back" href="../../LAPM.phase_type.html#LAPM.phase_type.z">[docs]</a><span class="k">def</span> <span class="nf">z</span><span class="p">(</span><span class="n">B</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return the (symbolic) vector of rates toward absorbing state.</span>
 
 <span class="sd">    Args:</span>
@@ -62,7 +60,7 @@
     <span class="n">o</span> <span class="o">=</span> <span class="n">ones</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">rows</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="o">-</span><span class="n">B</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span><span class="o">*</span><span class="n">o</span></div>
 
-<div class="viewcode-block" id="cum_dist_func"><a class="viewcode-back" href="../../LAPM.html#LAPM.phase_type.cum_dist_func">[docs]</a><span class="k">def</span> <span class="nf">cum_dist_func</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Qt</span><span class="p">):</span>
+<div class="viewcode-block" id="cum_dist_func"><a class="viewcode-back" href="../../LAPM.phase_type.html#LAPM.phase_type.cum_dist_func">[docs]</a><span class="k">def</span> <span class="nf">cum_dist_func</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Qt</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return the (symbolic) cumulative distribution function of phase-type.</span>
 
 <span class="sd">    Args:</span>
@@ -79,7 +77,7 @@
     <span class="n">o</span> <span class="o">=</span> <span class="n">ones</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">B</span><span class="o">.</span><span class="n">cols</span><span class="p">)</span>
     <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">o</span> <span class="o">*</span> <span class="p">(</span><span class="n">Qt</span> <span class="o">*</span> <span class="n">beta</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="expected_value"><a class="viewcode-back" href="../../LAPM.html#LAPM.phase_type.expected_value">[docs]</a><span class="k">def</span> <span class="nf">expected_value</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+<div class="viewcode-block" id="expected_value"><a class="viewcode-back" href="../../LAPM.phase_type.html#LAPM.phase_type.expected_value">[docs]</a><span class="k">def</span> <span class="nf">expected_value</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return the (symbolic) expected value of the phase-type distribution.</span>
 
 <span class="sd">    Args:</span>
@@ -94,7 +92,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">nth_moment</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="nth_moment"><a class="viewcode-back" href="../../LAPM.html#LAPM.phase_type.nth_moment">[docs]</a><span class="k">def</span> <span class="nf">nth_moment</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<div class="viewcode-block" id="nth_moment"><a class="viewcode-back" href="../../LAPM.phase_type.html#LAPM.phase_type.nth_moment">[docs]</a><span class="k">def</span> <span class="nf">nth_moment</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return the (symbolic) ``n`` th moment of the phase-type distribution.</span>
 
 <span class="sd">    Args:</span>
@@ -112,7 +110,7 @@
     <span class="n">o</span> <span class="o">=</span> <span class="n">ones</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">B</span><span class="o">.</span><span class="n">cols</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="n">n</span><span class="o">*</span><span class="n">factorial</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="n">o</span><span class="o">*</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">inv</span><span class="p">()</span><span class="o">**</span><span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="n">beta</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="variance"><a class="viewcode-back" href="../../LAPM.html#LAPM.phase_type.variance">[docs]</a><span class="k">def</span> <span class="nf">variance</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+<div class="viewcode-block" id="variance"><a class="viewcode-back" href="../../LAPM.phase_type.html#LAPM.phase_type.variance">[docs]</a><span class="k">def</span> <span class="nf">variance</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return the (symbolic) variance of the phase-type distribution.</span>
 
 <span class="sd">    Args:</span>
@@ -131,7 +129,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">nth_moment</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">expected_value</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="standard_deviation"><a class="viewcode-back" href="../../LAPM.html#LAPM.phase_type.standard_deviation">[docs]</a><span class="k">def</span> <span class="nf">standard_deviation</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+<div class="viewcode-block" id="standard_deviation"><a class="viewcode-back" href="../../LAPM.phase_type.html#LAPM.phase_type.standard_deviation">[docs]</a><span class="k">def</span> <span class="nf">standard_deviation</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return the (symbolic) standard deviation of the phase-type distribution.</span>
 
 <span class="sd">    Args:</span>
@@ -150,7 +148,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">variance</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">B</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="density"><a class="viewcode-back" href="../../LAPM.html#LAPM.phase_type.density">[docs]</a><span class="k">def</span> <span class="nf">density</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Qt</span><span class="p">):</span>
+<div class="viewcode-block" id="density"><a class="viewcode-back" href="../../LAPM.phase_type.html#LAPM.phase_type.density">[docs]</a><span class="k">def</span> <span class="nf">density</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Qt</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return the (symbolic) probability density function of the </span>
 <span class="sd">    phase-type distribution.</span>
 
@@ -171,7 +169,7 @@
     <span class="k">return</span> <span class="p">(</span><span class="n">z</span><span class="p">(</span><span class="n">B</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span><span class="o">*</span><span class="n">Qt</span><span class="o">*</span><span class="n">beta</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="laplace"><a class="viewcode-back" href="../../LAPM.html#LAPM.phase_type.laplace">[docs]</a><span class="k">def</span> <span class="nf">laplace</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+<div class="viewcode-block" id="laplace"><a class="viewcode-back" href="../../LAPM.phase_type.html#LAPM.phase_type.laplace">[docs]</a><span class="k">def</span> <span class="nf">laplace</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return the symbolic Laplacian of the phase-type distribtion.</span>
 
 <span class="sd">    Args:</span>
@@ -213,11 +211,11 @@
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/LAPM.phase_type.html">LAPM.phase_type</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/LAPM.linear_autonomous_pool_model.html">LAPM.linear_autonomous_pool_model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/LAPM.dtmc.html">LAPM.dtmc</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/LAPM.example_models.html">LAPM.example_models</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/LAPM.emanuel.html">LAPM.emanuel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../LAPM.phase_type.html">LAPM.phase_type</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../LAPM.linear_autonomous_pool_model.html">LAPM.linear_autonomous_pool_model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../LAPM.dtmc.html">LAPM.dtmc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../LAPM.example_models.html">LAPM.example_models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../LAPM.emanuel.html">LAPM.emanuel</a></li>
 </ul>
 
 <div class="relations">
@@ -255,7 +253,7 @@
       &copy;2020, Holger Metzler.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

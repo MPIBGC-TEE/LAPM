@@ -1,0 +1,372 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>LAPM.phase_type &#8212; LAPM 1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="LAPM.linear_autonomous_pool_model" href="LAPM.linear_autonomous_pool_model.html" />
+    <link rel="prev" title="Linear Autonomous Pool Models (LAPM)" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-LAPM.phase_type">
+<span id="lapm-phase-type"></span><h1>LAPM.phase_type<a class="headerlink" href="#module-LAPM.phase_type" title="Permalink to this headline">¶</a></h1>
+<p>Module for phase-type distribution.</p>
+<p><span class="math notranslate nohighlight">\(T\)</span> is supposed to be a phase-type distributed random variable.</p>
+<p class="rubric">Functions</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#LAPM.phase_type.cum_dist_func" title="LAPM.phase_type.cum_dist_func"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cum_dist_func</span></code></a>(beta, B, Qt)</p></td>
+<td><p>Return the (symbolic) cumulative distribution function of phase-type.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#LAPM.phase_type.density" title="LAPM.phase_type.density"><code class="xref py py-obj docutils literal notranslate"><span class="pre">density</span></code></a>(beta, B, Qt)</p></td>
+<td><p>Return the (symbolic) probability density function of the phase-type distribution.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#LAPM.phase_type.expected_value" title="LAPM.phase_type.expected_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expected_value</span></code></a>(beta, B)</p></td>
+<td><p>Return the (symbolic) expected value of the phase-type distribution.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#LAPM.phase_type.laplace" title="LAPM.phase_type.laplace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">laplace</span></code></a>(beta, B)</p></td>
+<td><p>Return the symbolic Laplacian of the phase-type distribtion.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#LAPM.phase_type.nth_moment" title="LAPM.phase_type.nth_moment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nth_moment</span></code></a>(beta, B, n)</p></td>
+<td><p>Return the (symbolic) <code class="docutils literal notranslate"><span class="pre">n</span></code> th moment of the phase-type distribution.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#LAPM.phase_type.standard_deviation" title="LAPM.phase_type.standard_deviation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">standard_deviation</span></code></a>(beta, B)</p></td>
+<td><p>Return the (symbolic) standard deviation of the phase-type distribution.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#LAPM.phase_type.variance" title="LAPM.phase_type.variance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variance</span></code></a>(beta, B)</p></td>
+<td><p>Return the (symbolic) variance of the phase-type distribution.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#LAPM.phase_type.z" title="LAPM.phase_type.z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">z</span></code></a>(B)</p></td>
+<td><p>Return the (symbolic) vector of rates toward absorbing state.</p></td>
+</tr>
+</tbody>
+</table>
+<section id="detailed-module-content">
+<h2>Detailed module content<a class="headerlink" href="#detailed-module-content" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="LAPM.phase_type.cum_dist_func">
+<span class="sig-prename descclassname"><span class="pre">LAPM.phase_type.</span></span><span class="sig-name descname"><span class="pre">cum_dist_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Qt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/LAPM/phase_type.html#cum_dist_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LAPM.phase_type.cum_dist_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the (symbolic) cumulative distribution function of phase-type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>beta</strong> (<em>SymPy dx1-matrix</em>) – initial distribution vector</p></li>
+<li><p><strong>B</strong> (<em>SymPy dxd-matrix</em>) – transition rate matrix</p></li>
+<li><p><strong>Qt</strong> (<em>SymPy dxd-matrix</em>) – Qt = <span class="math notranslate nohighlight">\(e^{t\,B}\)</span></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>cumulative distribution function of
+PH(<span class="math notranslate nohighlight">\(\beta\)</span>, <span class="math notranslate nohighlight">\(B\)</span>)</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(F_T(t) = 1 - \mathbf{1}^T\,e^{t\,B}\,\beta\)</span></p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>SymPy expression</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="LAPM.phase_type.density">
+<span class="sig-prename descclassname"><span class="pre">LAPM.phase_type.</span></span><span class="sig-name descname"><span class="pre">density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Qt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/LAPM/phase_type.html#density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LAPM.phase_type.density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the (symbolic) probability density function of the
+phase-type distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>beta</strong> (<em>SymPy dx1-matrix</em>) – initial distribution vector</p></li>
+<li><p><strong>B</strong> (<em>SymPy dxd-matrix</em>) – transition rate matrix</p></li>
+<li><p><strong>Qt</strong> (<em>SymPy dxd-matrix</em>) – Qt = <span class="math notranslate nohighlight">\(e^{t\,B}\)</span></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>probability density function of
+PH(<span class="math notranslate nohighlight">\(\beta\)</span>, <span class="math notranslate nohighlight">\(B\)</span>)</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(f_T(t) = z^T\,e^{t\,B}\,\beta\)</span></p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>SymPy expression</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#LAPM.phase_type.z" title="LAPM.phase_type.z"><code class="xref py py-func docutils literal notranslate"><span class="pre">z()</span></code></a>: Return the (symbolic) vector of external output rates.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="LAPM.phase_type.expected_value">
+<span class="sig-prename descclassname"><span class="pre">LAPM.phase_type.</span></span><span class="sig-name descname"><span class="pre">expected_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/LAPM/phase_type.html#expected_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LAPM.phase_type.expected_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the (symbolic) expected value of the phase-type distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>beta</strong> (<em>SymPy dx1-matrix</em>) – initial distribution vector</p></li>
+<li><p><strong>B</strong> (<em>SymPy dxd-matrix</em>) – transition rate matrix</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>expected value of PH(<span class="math notranslate nohighlight">\(\beta\)</span>, <span class="math notranslate nohighlight">\(B\)</span>)</p>
+<p><span class="math notranslate nohighlight">\(\mathbb{E}[T] = -\mathbf{1}^T\,B^{-1}\,\beta\)</span></p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>SymPy expression</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="LAPM.phase_type.laplace">
+<span class="sig-prename descclassname"><span class="pre">LAPM.phase_type.</span></span><span class="sig-name descname"><span class="pre">laplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/LAPM/phase_type.html#laplace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LAPM.phase_type.laplace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the symbolic Laplacian of the phase-type distribtion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>beta</strong> (<em>SymPy dx1-matrix</em>) – initial distribution vector</p></li>
+<li><p><strong>B</strong> (<em>SymPy dxd-matrix</em>) – transition rate matrix</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>Laplace transform of the probability density of
+PH(<span class="math notranslate nohighlight">\(\beta\)</span>, <span class="math notranslate nohighlight">\(B\)</span>)</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(L_T(s)=\)</span>
+<span class="math notranslate nohighlight">\(z^T\,(s\,I-B)^{-1}\,\beta\)</span></p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>SymPy expression</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#LAPM.phase_type.z" title="LAPM.phase_type.z"><code class="xref py py-func docutils literal notranslate"><span class="pre">z()</span></code></a>: Return the (symbolic) vector of external output rates.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="LAPM.phase_type.nth_moment">
+<span class="sig-prename descclassname"><span class="pre">LAPM.phase_type.</span></span><span class="sig-name descname"><span class="pre">nth_moment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/LAPM/phase_type.html#nth_moment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LAPM.phase_type.nth_moment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the (symbolic) <code class="docutils literal notranslate"><span class="pre">n</span></code> th moment of the phase-type distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>beta</strong> (<em>SymPy dx1-matrix</em>) – initial distribution vector</p></li>
+<li><p><strong>B</strong> (<em>SymPy dxd-matrix</em>) – transition rate matrix</p></li>
+<li><p><strong>n</strong> (<em>positive int</em>) – order of the moment</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><code class="docutils literal notranslate"><span class="pre">n</span></code> th moment of
+PH(<span class="math notranslate nohighlight">\(\beta\)</span>, <span class="math notranslate nohighlight">\(B\)</span>)</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(\mathbb{E}[T^n]=\)</span>
+<span class="math notranslate nohighlight">\((-1)^n\,n!\,\mathbf{1}^T\,B^{-1}\,\beta\)</span></p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>SymPy expression</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="LAPM.phase_type.standard_deviation">
+<span class="sig-prename descclassname"><span class="pre">LAPM.phase_type.</span></span><span class="sig-name descname"><span class="pre">standard_deviation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/LAPM/phase_type.html#standard_deviation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LAPM.phase_type.standard_deviation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the (symbolic) standard deviation of the phase-type distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>beta</strong> (<em>SymPy dx1-matrix</em>) – initial distribution vector</p></li>
+<li><p><strong>B</strong> (<em>SymPy dxd-matrix</em>) – transition rate matrix</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>standard deviation of
+PH(<span class="math notranslate nohighlight">\(\beta\)</span>, <span class="math notranslate nohighlight">\(B\)</span>)</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(\sigma(T) = \sqrt{\sigma^2(T)}\)</span></p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>SymPy expression</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#LAPM.phase_type.variance" title="LAPM.phase_type.variance"><code class="xref py py-func docutils literal notranslate"><span class="pre">variance()</span></code></a>: Return the (symbolic) variance of the phase-type</dt><dd><p>distribution.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="LAPM.phase_type.variance">
+<span class="sig-prename descclassname"><span class="pre">LAPM.phase_type.</span></span><span class="sig-name descname"><span class="pre">variance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/LAPM/phase_type.html#variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LAPM.phase_type.variance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the (symbolic) variance of the phase-type distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>beta</strong> (<em>SymPy dx1-matrix</em>) – initial distribution vector</p></li>
+<li><p><strong>B</strong> (<em>SymPy dxd-matrix</em>) – transition rate matrix</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>variance of PH(<span class="math notranslate nohighlight">\(\beta\)</span>, <span class="math notranslate nohighlight">\(B\)</span>)</dt><dd><p><span class="math notranslate nohighlight">\(\sigma^2(T) = \mathbb{E}[T^2] - (\mathbb{E}[T])^2\)</span></p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>SymPy expression</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<div class="line-block">
+<div class="line"><a class="reference internal" href="#LAPM.phase_type.expected_value" title="LAPM.phase_type.expected_value"><code class="xref py py-func docutils literal notranslate"><span class="pre">expected_value()</span></code></a>: Return the (symbolic) expected value of the
+phase-type distribution.</div>
+<div class="line"><a class="reference internal" href="#LAPM.phase_type.nth_moment" title="LAPM.phase_type.nth_moment"><code class="xref py py-func docutils literal notranslate"><span class="pre">nth_moment()</span></code></a>: Return the (symbolic) nth moment of the
+phase-type distribution.</div>
+</div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="LAPM.phase_type.z">
+<span class="sig-prename descclassname"><span class="pre">LAPM.phase_type.</span></span><span class="sig-name descname"><span class="pre">z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/LAPM/phase_type.html#z"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LAPM.phase_type.z" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the (symbolic) vector of rates toward absorbing state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>B</strong> (<em>SymPy dxd-matrix</em>) – compartment matrix</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\(z = -B^T\,\mathbf{1}\)</span></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>SymPy dx1-matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">LAPM</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">LAPM.phase_type</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#detailed-module-content">Detailed module content</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="LAPM.linear_autonomous_pool_model.html">LAPM.linear_autonomous_pool_model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LAPM.dtmc.html">LAPM.dtmc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LAPM.example_models.html">LAPM.example_models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LAPM.emanuel.html">LAPM.emanuel</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Linear Autonomous Pool Models (LAPM)</a></li>
+      <li>Next: <a href="LAPM.linear_autonomous_pool_model.html" title="next chapter">LAPM.linear_autonomous_pool_model</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Holger Metzler.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/LAPM.phase_type.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

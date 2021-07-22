@@ -181,14 +181,14 @@ def _generalized_inverse_CDF(CDF, u, start_dist=1e-4, tol=1e-8):
 
 
 def create_random_vector(d: int, p: float) -> np.ndarray:
-    """Create a random vector.
+    """Create a random probability vector.
     
     Args:
         d: dimension of the random vector
         p: probability of setting elements to nonzero value
         
     Returns:
-        random vector `v` s.t.
+        random probability vector `v` s.t.
         - :math:`v_i \geq 0`
         - :math:`\mathbb{P}(v_i>0) = p`
         - :math:`\sum_i v_i=1`
@@ -202,7 +202,7 @@ def create_random_vector(d: int, p: float) -> np.ndarray:
 
 
 def create_random_compartmental_matrix(d: int, p: float, D: np.ndarray = None) -> np.ndarray:
-    """Create a random compartmental matrix.
+    r"""Create a random compartmental matrix.
     
     Args:
         d: dimension of the matrix (number of pools)
@@ -211,7 +211,8 @@ def create_random_compartmental_matrix(d: int, p: float, D: np.ndarray = None) -
             provided, entries will be drawn uniformly from [0, 1]
         
     Returns:
-        compartmental matrix `B` s.t.
+        random compartmental matrix `B` s.t.
+
         - all diagonal entries are nonpositive
         - all off-diagonal entries are nonnegative
         - all column sums are nonpositive
@@ -336,7 +337,7 @@ class LinearAutonomousPoolModel(object):
             randomly generated compartmental system
             
             - `beta`: from :func:`create_random_vector`
-            - `B: from :func:`~create_random_compartmental_matrix
+            - `B: from :func:`~create_random_compartmental_matrix`
         """
         beta = Matrix(create_random_vector(d, p))
         B = Matrix(create_random_compartmental_matrix(d, p, D))
