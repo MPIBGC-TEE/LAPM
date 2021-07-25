@@ -44,10 +44,10 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#LAPM.linear_autonomous_pool_model.create_random_compartmental_matrix" title="LAPM.linear_autonomous_pool_model.create_random_compartmental_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_random_compartmental_matrix</span></code></a>(d, p[, D])</p></td>
-<td><p>Create a random compartmental matrix.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#LAPM.linear_autonomous_pool_model.create_random_compartmental_matrix" title="LAPM.linear_autonomous_pool_model.create_random_compartmental_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_random_compartmental_matrix</span></code></a>(d, p)</p></td>
+<td><p>Create a random invertible compartmental matrix.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#LAPM.linear_autonomous_pool_model.create_random_vector" title="LAPM.linear_autonomous_pool_model.create_random_vector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_random_vector</span></code></a>(d, p)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#LAPM.linear_autonomous_pool_model.create_random_probability_vector" title="LAPM.linear_autonomous_pool_model.create_random_probability_vector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_random_probability_vector</span></code></a>(d, p)</p></td>
 <td><p>Create a random probability vector.</p></td>
 </tr>
 </tbody>
@@ -785,7 +785,7 @@ system age.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="LAPM.linear_autonomous_pool_model.LinearAutonomousPoolModel.from_random">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">from_random</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/LAPM/linear_autonomous_pool_model.html#LinearAutonomousPoolModel.from_random"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LAPM.linear_autonomous_pool_model.LinearAutonomousPoolModel.from_random" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">from_random</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/LAPM/linear_autonomous_pool_model.html#LinearAutonomousPoolModel.from_random"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LAPM.linear_autonomous_pool_model.LinearAutonomousPoolModel.from_random" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a random compartmental system.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -793,14 +793,12 @@ system age.</p>
 <li><p><strong>d</strong> – dimension of the matrix (number of pools)</p></li>
 <li><p><strong>p</strong> – probability of having a connection between two pools
 and of nonzero value in input vector</p></li>
-<li><p><strong>D</strong> – optional, compartment speed vector (<cite>-diag(B)</cite>), if not
-provided, entries will be drawn uniformly from [0, 1]</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><p>randomly generated compartmental system</p>
 <ul class="simple">
-<li><p><cite>beta</cite>: from <a class="reference internal" href="#LAPM.linear_autonomous_pool_model.create_random_vector" title="LAPM.linear_autonomous_pool_model.create_random_vector"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_random_vector()</span></code></a></p></li>
+<li><p><cite>beta</cite>: from <a class="reference internal" href="#LAPM.linear_autonomous_pool_model.create_random_probability_vector" title="LAPM.linear_autonomous_pool_model.create_random_probability_vector"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_random_probability_vector()</span></code></a></p></li>
 <li><p><cite>B: from :func:`~create_random_compartmental_matrix</cite></p></li>
 </ul>
 </p>
@@ -880,25 +878,23 @@ set self.__traceback__ to tb and return self.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="LAPM.linear_autonomous_pool_model.create_random_compartmental_matrix">
-<span class="sig-prename descclassname"><span class="pre">LAPM.linear_autonomous_pool_model.</span></span><span class="sig-name descname"><span class="pre">create_random_compartmental_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">numpy.ndarray</span><a class="reference internal" href="_modules/LAPM/linear_autonomous_pool_model.html#create_random_compartmental_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LAPM.linear_autonomous_pool_model.create_random_compartmental_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a random compartmental matrix.</p>
+<span class="sig-prename descclassname"><span class="pre">LAPM.linear_autonomous_pool_model.</span></span><span class="sig-name descname"><span class="pre">create_random_compartmental_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">numpy.ndarray</span><a class="reference internal" href="_modules/LAPM/linear_autonomous_pool_model.html#create_random_compartmental_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LAPM.linear_autonomous_pool_model.create_random_compartmental_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a random invertible compartmental matrix.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>d</strong> – dimension of the matrix (number of pools)</p></li>
-<li><p><strong>p</strong> – probability of having a connection between two pools</p></li>
-<li><p><strong>D</strong> – optional, compartment speed vector (<cite>-diag(B)</cite>), if not
-provided, entries will be drawn uniformly from [0, 1]</p></li>
+<li><p><strong>p</strong> – probability of existence of non-necessary connections</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>random compartmental matrix <cite>B</cite> s.t.</p>
+<dd class="field-even"><p><p>random invertible compartmental matrix <cite>B</cite> s.t.</p>
 <ul class="simple">
 <li><p>all diagonal entries are nonpositive</p></li>
 <li><p>all off-diagonal entries are nonnegative</p></li>
 <li><p>all column sums are nonpositive</p></li>
 <li><p><span class="math notranslate nohighlight">\(B\)</span> is invertible</p></li>
-<li><p><span class="math notranslate nohighlight">\(-B_{ii} &lt;= 1\)</span> (if <cite>D</cite> not provided, mean sojourn time)</p></li>
+<li><p><span class="math notranslate nohighlight">\(-B_{ii} &lt;= 1\)</span></p></li>
 <li><p><span class="math notranslate nohighlight">\(\mathbb{P}(B_{ij}&gt;0) = p\)</span> for <span class="math notranslate nohighlight">\(i \neq j\)</span></p></li>
 <li><p><span class="math notranslate nohighlight">\(\mathbb{P}(z_j)&gt;0) = p\)</span>, where <span class="math notranslate nohighlight">\(z_j = -\sum_i B_{ij}\)</span></p></li>
 </ul>
@@ -908,8 +904,8 @@ provided, entries will be drawn uniformly from [0, 1]</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="LAPM.linear_autonomous_pool_model.create_random_vector">
-<span class="sig-prename descclassname"><span class="pre">LAPM.linear_autonomous_pool_model.</span></span><span class="sig-name descname"><span class="pre">create_random_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">numpy.ndarray</span><a class="reference internal" href="_modules/LAPM/linear_autonomous_pool_model.html#create_random_vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LAPM.linear_autonomous_pool_model.create_random_vector" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="LAPM.linear_autonomous_pool_model.create_random_probability_vector">
+<span class="sig-prename descclassname"><span class="pre">LAPM.linear_autonomous_pool_model.</span></span><span class="sig-name descname"><span class="pre">create_random_probability_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">numpy.ndarray</span><a class="reference internal" href="_modules/LAPM/linear_autonomous_pool_model.html#create_random_probability_vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LAPM.linear_autonomous_pool_model.create_random_probability_vector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a random probability vector.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

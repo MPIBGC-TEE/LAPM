@@ -213,7 +213,7 @@
     <span class="k">return</span> <span class="n">res</span>
 
 
-<div class="viewcode-block" id="create_random_vector"><a class="viewcode-back" href="../../LAPM.linear_autonomous_pool_model.html#LAPM.linear_autonomous_pool_model.create_random_vector">[docs]</a><span class="k">def</span> <span class="nf">create_random_vector</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<div class="viewcode-block" id="create_random_probability_vector"><a class="viewcode-back" href="../../LAPM.linear_autonomous_pool_model.html#LAPM.linear_autonomous_pool_model.create_random_probability_vector">[docs]</a><span class="k">def</span> <span class="nf">create_random_probability_vector</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Create a random probability vector.</span>
 <span class="sd">    </span>
 <span class="sd">    Args:</span>
@@ -234,39 +234,61 @@
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">v</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="create_random_compartmental_matrix"><a class="viewcode-back" href="../../LAPM.linear_autonomous_pool_model.html#LAPM.linear_autonomous_pool_model.create_random_compartmental_matrix">[docs]</a><span class="k">def</span> <span class="nf">create_random_compartmental_matrix</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">D</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a random compartmental matrix.</span>
+<div class="viewcode-block" id="create_random_compartmental_matrix"><a class="viewcode-back" href="../../LAPM.linear_autonomous_pool_model.html#LAPM.linear_autonomous_pool_model.create_random_compartmental_matrix">[docs]</a><span class="k">def</span> <span class="nf">create_random_compartmental_matrix</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a random invertible compartmental matrix.</span>
 <span class="sd">    </span>
 <span class="sd">    Args:</span>
 <span class="sd">        d: dimension of the matrix (number of pools)</span>
-<span class="sd">        p: probability of having a connection between two pools</span>
-<span class="sd">        D: optional, compartment speed vector (`-diag(B)`), if not</span>
-<span class="sd">            provided, entries will be drawn uniformly from [0, 1]</span>
+<span class="sd">        p: probability of existence of non-necessary connections</span>
 <span class="sd">        </span>
 <span class="sd">    Returns:</span>
-<span class="sd">        random compartmental matrix `B` s.t.</span>
+<span class="sd">        random invertible compartmental matrix `B` s.t.</span>
 
 <span class="sd">        - all diagonal entries are nonpositive</span>
 <span class="sd">        - all off-diagonal entries are nonnegative</span>
 <span class="sd">        - all column sums are nonpositive</span>
 <span class="sd">        - :math:`B` is invertible</span>
-<span class="sd">        - :math:`-B_{ii} &lt;= 1` (if `D` not provided, mean sojourn time)</span>
+<span class="sd">        - :math:`-B_{ii} &lt;= 1`</span>
 <span class="sd">        - :math:`\mathbb{P}(B_{ij}&gt;0) = p` for :math:`i \neq j`</span>
 <span class="sd">        - :math:`\mathbb{P}(z_j)&gt;0) = p`, where :math:`z_j = -\sum_i B_{ij}`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-        <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">create_random_vector</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">d</span><span class="p">)])</span>
-        <span class="k">if</span> <span class="n">D</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+    <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># add pools step by step, always keep the new pools connected to the </span>
+    <span class="c1"># previous smaller system</span>
+    <span class="c1"># pool 0 is the output pool</span>
+    
+    <span class="c1"># build adjacency matrix</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="c1"># random connections to smaller output-connected system</span>
+        <span class="n">V</span><span class="p">[:</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
         
-        <span class="n">B</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
-            <span class="n">B</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">D</span> <span class="o">*</span> <span class="n">V</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span>
+        <span class="c1"># random connections from smaller output-connected system</span>
+        <span class="n">V</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="p">:</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        
+        <span class="c1"># ensure connection to smaller output-connected system</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+        <span class="n">V</span><span class="p">[</span><span class="n">c</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="c1"># create B from adjacency matrix,</span>
+    <span class="c1"># repeat until det(B) is significantly different from 0</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mf">1e-08</span><span class="p">:</span>
+        <span class="c1"># make random speeds from adjacencies</span>
+        <span class="c1"># (1 - uniform) to make sure the value will not be 0</span>
+        <span class="c1"># with a 0 value an essential connection could get lost</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">V</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+    
+        <span class="c1"># build diagonals</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
             <span class="n">B</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">B</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
         
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">B</span><span class="p">):</span>
-<span class="c1">#            print(&quot;XXX&quot;, np.linalg.det(B))</span>
-            <span class="k">return</span> <span class="n">B</span></div>
+        <span class="c1"># ignore output pool 0</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">B</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>
+        
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">B</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">B</span></div>
 
 
 <span class="c1">############################################################################</span>
@@ -339,6 +361,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">B</span><span class="o">.</span><span class="n">inv</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">NonInvertibleCompartmentalMatrix</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">            The matrix B is not invertible. </span>
 <span class="s2">            While there are compartmental systems that have singular matrices </span>
@@ -355,7 +378,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">Qt</span> <span class="o">=</span> <span class="n">exp</span><span class="p">(</span><span class="n">t</span><span class="o">*</span><span class="n">B</span><span class="p">)</span>
 
 <div class="viewcode-block" id="LinearAutonomousPoolModel.from_random"><a class="viewcode-back" href="../../LAPM.linear_autonomous_pool_model.html#LAPM.linear_autonomous_pool_model.LinearAutonomousPoolModel.from_random">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_random</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">D</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">from_random</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create a random compartmental system.</span>
 
 <span class="sd">    </span>
@@ -363,17 +386,15 @@
 <span class="sd">            d: dimension of the matrix (number of pools)</span>
 <span class="sd">            p: probability of having a connection between two pools</span>
 <span class="sd">                and of nonzero value in input vector</span>
-<span class="sd">            D: optional, compartment speed vector (`-diag(B)`), if not</span>
-<span class="sd">                provided, entries will be drawn uniformly from [0, 1]</span>
 <span class="sd">        </span>
 <span class="sd">        Returns:</span>
 <span class="sd">            randomly generated compartmental system</span>
 <span class="sd">            </span>
-<span class="sd">            - `beta`: from :func:`create_random_vector`</span>
+<span class="sd">            - `beta`: from :func:`create_random_probability_vector`</span>
 <span class="sd">            - `B: from :func:`~create_random_compartmental_matrix`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">beta</span> <span class="o">=</span> <span class="n">Matrix</span><span class="p">(</span><span class="n">create_random_vector</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
-        <span class="n">B</span> <span class="o">=</span> <span class="n">Matrix</span><span class="p">(</span><span class="n">create_random_compartmental_matrix</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">D</span><span class="p">))</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="n">Matrix</span><span class="p">(</span><span class="n">create_random_probability_vector</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">Matrix</span><span class="p">(</span><span class="n">create_random_compartmental_matrix</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
         
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">force_numerical</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 

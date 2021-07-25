@@ -180,7 +180,7 @@ def _generalized_inverse_CDF(CDF, u, start_dist=1e-4, tol=1e-8):
     return res
 
 
-def create_random_vector(d: int, p: float) -> np.ndarray:
+def create_random_probability_vector(d: int, p: float) -> np.ndarray:
     """Create a random probability vector.
     
     Args:
@@ -201,39 +201,61 @@ def create_random_vector(d: int, p: float) -> np.ndarray:
             return np.random.permutation(v)
 
 
-def create_random_compartmental_matrix(d: int, p: float, D: np.ndarray = None) -> np.ndarray:
-    r"""Create a random compartmental matrix.
+def create_random_compartmental_matrix(d: int, p: float) -> np.ndarray:
+    r"""Create a random invertible compartmental matrix.
     
     Args:
         d: dimension of the matrix (number of pools)
-        p: probability of having a connection between two pools
-        D: optional, compartment speed vector (`-diag(B)`), if not
-            provided, entries will be drawn uniformly from [0, 1]
+        p: probability of existence of non-necessary connections
         
     Returns:
-        random compartmental matrix `B` s.t.
+        random invertible compartmental matrix `B` s.t.
 
         - all diagonal entries are nonpositive
         - all off-diagonal entries are nonnegative
         - all column sums are nonpositive
         - :math:`B` is invertible
-        - :math:`-B_{ii} <= 1` (if `D` not provided, mean sojourn time)
+        - :math:`-B_{ii} <= 1`
         - :math:`\mathbb{P}(B_{ij}>0) = p` for :math:`i \neq j`
         - :math:`\mathbb{P}(z_j)>0) = p`, where :math:`z_j = -\sum_i B_{ij}`
     """
-    while True:
-        V = np.array([create_random_vector(d, p) for _ in range(d)])
-        if D is None:
-            D = np.random.uniform(0, 1, d)
+    V = np.zeros((d+1, d+1))
+
+    # add pools step by step, always keep the new pools connected to the 
+    # previous smaller system
+    # pool 0 is the output pool
+    
+    # build adjacency matrix
+    for n in range(1, d+1):
+        # random connections to smaller output-connected system
+        V[:n, n] = np.random.binomial(1, p, n)
         
-        B = -np.diag(D)
-        for j in range(d):
-            B[:, j] = D * V[:, j]
+        # random connections from smaller output-connected system
+        V[n, :n] = np.random.binomial(1, p, n)
+        
+        # ensure connection to smaller output-connected system
+        c = np.random.choice(np.arange(n))
+        V[c, n] = 1
+
+    # create B from adjacency matrix,
+    # repeat until det(B) is significantly different from 0
+    x = 0
+    while x < 1e-08:
+        # make random speeds from adjacencies
+        # (1 - uniform) to make sure the value will not be 0
+        # with a 0 value an essential connection could get lost
+        B = V * (1 - np.random.uniform(0, 1, (d+1)**2).reshape((d+1, d+1)))
+    
+        # build diagonals
+        for j in range(B.shape[1]):
             B[j, j] = -B[:, j].sum()
         
-        if np.linalg.det(B):
-#            print("XXX", np.linalg.det(B))
-            return B
+        # ignore output pool 0
+        B = B[1:, 1:]
+        
+        x = np.abs(np.linalg.det(B))
+
+    return B
 
 
 ############################################################################
@@ -306,6 +328,7 @@ class LinearAutonomousPoolModel(object):
         try:
             B.inv()
         except ValueError as e:
+            print(B)
             raise NonInvertibleCompartmentalMatrix("""
             The matrix B is not invertible. 
             While there are compartmental systems that have singular matrices 
@@ -322,7 +345,7 @@ class LinearAutonomousPoolModel(object):
             self.Qt = exp(t*B)
 
     @classmethod
-    def from_random(cls, d: int, p: float, D: np.ndarray = None):
+    def from_random(cls, d: int, p: float):
         """Create a random compartmental system.
 
     
@@ -330,17 +353,15 @@ class LinearAutonomousPoolModel(object):
             d: dimension of the matrix (number of pools)
             p: probability of having a connection between two pools
                 and of nonzero value in input vector
-            D: optional, compartment speed vector (`-diag(B)`), if not
-                provided, entries will be drawn uniformly from [0, 1]
         
         Returns:
             randomly generated compartmental system
             
-            - `beta`: from :func:`create_random_vector`
+            - `beta`: from :func:`create_random_probability_vector`
             - `B: from :func:`~create_random_compartmental_matrix`
         """
-        beta = Matrix(create_random_vector(d, p))
-        B = Matrix(create_random_compartmental_matrix(d, p, D))
+        beta = Matrix(create_random_probability_vector(d, p))
+        B = Matrix(create_random_compartmental_matrix(d, p))
         
         return cls(beta, B, force_numerical=True)
 
