@@ -193,12 +193,16 @@ def create_random_probability_vector(d: int, p: float) -> np.ndarray:
         - :math:`\mathbb{P}(v_i>0) = p`
         - :math:`\sum_i v_i=1`
     """
-    while True:
-        v = np.random.binomial(1, p, d)
-        v = v * np.random.uniform(0, 1, d)
-        if v.sum():
-            v = v / v.sum()
-            return np.random.permutation(v)
+    v = np.random.binomial(1, p, d)
+    v = v * np.random.uniform(0, 1, d)
+    if v.sum():
+        v = v / v.sum()
+        return np.random.permutation(v)
+    else:
+        # ensure that at least one entry is greater than 0
+        c = np.random.choice(np.arange(d))
+        v[c] = 1.0
+        return v
 
 
 def create_random_compartmental_matrix(d: int, p: float) -> np.ndarray:
