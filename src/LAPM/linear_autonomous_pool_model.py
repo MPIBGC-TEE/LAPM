@@ -258,7 +258,6 @@ def create_random_compartmental_matrix(d: int, p: float) -> np.ndarray:
         B = B[1:, 1:]
         
         x = np.abs(np.linalg.det(B))
-
     return B
 
 
