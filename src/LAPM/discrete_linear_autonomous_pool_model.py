@@ -192,6 +192,8 @@ class DiscreteLinearAutonomousPoolModel():
             return IdmB_inv @ (Id-matrix_power(B, ai+1)) @ U
 
         if xss is None:
+            return P0_self
+        else:
             # rescale from fake equilibrium pool contents to start_vector contents
             renorm_vector = xss / self.xss 
             P0 = lambda ai: P0_self(ai) * renorm_vector
