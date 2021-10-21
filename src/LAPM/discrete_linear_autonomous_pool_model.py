@@ -6,8 +6,10 @@ from typing import Callable
 
 import numpy as np
 from numpy.linalg import matrix_power
-from scipy.linalg import inv
+from scipy.linalg import inv, LinAlgError
 from scipy.special import factorial
+
+from LAPM import picklegzip
 
 
 class DiscreteLinearAutonomousPoolModel():
@@ -29,6 +31,9 @@ class DiscreteLinearAutonomousPoolModel():
             check_row_sums: if False, the row sum condition will not be checked,
                 can be useful in case of minimal transgressions
         """
+        if (U < 0).sum() > 0:
+            raise ValueError("Negative values in input vector.")
+
         if (B < 0).sum() > 0:
             raise ValueError("Negative values in discrete compartmental matrix.")
 
@@ -39,6 +44,10 @@ class DiscreteLinearAutonomousPoolModel():
 
         self.U = U
         self.B = B
+
+        Id = np.identity(self.nr_pools)
+        
+        inv(Id-B)
 
     @property
     def nr_pools(self) -> float:
@@ -198,3 +207,12 @@ class DiscreteLinearAutonomousPoolModel():
             renorm_vector = xss / self.xss 
             P0 = lambda ai: P0_self(ai) * renorm_vector
             return P0
+
+    @classmethod
+    def load_from_file(cls, filename):
+        dmr_eq = picklegzip.load(filename)
+        return dmr_eq
+
+    def save_to_file(self, filename):
+        picklegzip.dump(self, filename)
+    
