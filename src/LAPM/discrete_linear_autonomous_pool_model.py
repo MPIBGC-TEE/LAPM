@@ -143,7 +143,6 @@ class DiscreteLinearAutonomousPoolModel():
             xss = self.xss
 
         xss = np.ma.masked_array(xss, mask)
-        print(xss)
         total_mass = xss.sum()
         
         return (age_moment_vector*xss).sum()/total_mass
@@ -207,6 +206,33 @@ class DiscreteLinearAutonomousPoolModel():
             renorm_vector = xss / self.xss 
             P0 = lambda ai: P0_self(ai) * renorm_vector
             return P0
+
+    def external_output_rate_vector(self):
+        rho = 1 - self.B.sum(0)
+        return rho
+
+    def external_output_vector(self):
+        rho = self.external_output_rate_vector()
+        r = rho * self.xss
+        return r
+
+    def transit_time_moment(self, order):
+        age_moment_vector = self.age_moment_vector(order)
+        r = self.external_output_vector()
+        tt_moment = (r * age_moment_vector).sum() / r.sum()
+        return tt_moment
+
+    def transit_time_mass_func(self):
+        p0 = self.age_masses_func()
+        rho = self.external_output_rate_vector()
+
+        def p0_tt(ai):
+            return (rho * p0(ai)).sum()
+
+        return p0_tt
+
+    #### disk operations ####
+
 
     @classmethod
     def load_from_file(cls, filename):
