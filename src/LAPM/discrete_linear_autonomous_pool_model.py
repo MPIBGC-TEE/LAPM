@@ -19,7 +19,7 @@ class DiscreteLinearAutonomousPoolModel():
 
     Time step size is fixed to 1. No symbolic treatment, purely numerical.
     """
-    def __init__(self, U: np.ndarray, B:np.ndarray, check_row_sums: bool = True):
+    def __init__(self, U: np.ndarray, B:np.ndarray, check_row_sums: bool=True):
         """
         Args:
             U: one-dimensional external input vector
@@ -46,8 +46,35 @@ class DiscreteLinearAutonomousPoolModel():
         self.B = B
 
         Id = np.identity(self.nr_pools)
-        
+       
+        # test if matrix is invertible 
         inv(Id-B)
+
+    def restrict_to_pools(
+        self,
+        pool_nrs: np.ndarray,
+        check_row_sums: bool=True
+    ) -> '__class__':
+        """Restrict the discrete model run to a subset of pools.
+
+        Args:
+            pool_nrs: array of pool numbers INSIDE the resctricted model,
+                all other pools will be considered as OUSTIDE
+            check_row_sums: if False, the row sum condition will not be checked,
+                can be useful in case of minimal transgressions
+
+        Returns:
+            a DMR in equilibrium with ``len(pool_nrs)`` pools
+        """
+        nr_pools = len(pool_nrs)
+        U_restricted = np.nan * np.ones(nr_pools)
+        U_restricted[:] = self.U[pool_nrs]
+
+        B_restricted = np.nan * np.ones((nr_pools, nr_pools))
+        B_restricted = self.B[pool_nrs][:, pool_nrs]
+
+        dmr_eq_restricted = self.__class__(U_restricted, B_restricted, check_row_sums)
+        return dmr_eq_restricted
 
     @property
     def nr_pools(self) -> float:
@@ -208,21 +235,37 @@ class DiscreteLinearAutonomousPoolModel():
             return P0
 
     def external_output_rate_vector(self):
+        """Vector of external output rates."""
         rho = 1 - self.B.sum(0)
         return rho
 
     def external_output_vector(self):
+        """Vector of external outputs."""
         rho = self.external_output_rate_vector()
         r = rho * self.xss
         return r
 
     def transit_time_moment(self, order):
+        """Moment of the age of the material in the outflux.
+
+        Args:
+            order: 1 = mean, 2 = variance, ...
+
+        Returns:
+            Moment of the transit time
+        """
         age_moment_vector = self.age_moment_vector(order)
         r = self.external_output_vector()
         tt_moment = (r * age_moment_vector).sum() / r.sum()
         return tt_moment
 
     def transit_time_mass_func(self):
+        """Function of age index, returns mass in the outflux with with this age.
+
+        Returns:
+            p0_tt: function ``of`` ai (age index), returns mass with age ``ai``
+                in the outflux
+        """
         p0 = self.age_masses_func()
         rho = self.external_output_rate_vector()
 
@@ -231,14 +274,17 @@ class DiscreteLinearAutonomousPoolModel():
 
         return p0_tt
 
+
     #### disk operations ####
 
 
     @classmethod
     def load_from_file(cls, filename):
+        """Load a class instance from disk."""
         dmr_eq = picklegzip.load(filename)
         return dmr_eq
 
     def save_to_file(self, filename):
+        """Save a class instance to disk."""
         picklegzip.dump(self, filename)
     
