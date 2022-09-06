@@ -975,7 +975,6 @@ class LinearAutonomousPoolModel(object):
             Return the (symbolic) stationary distribution.
         """
         d = self.B.rows
-        P = self.ergodic_jump_chain.P
         pi = self.ergodic_jump_chain.stationary_distribution
     
         theta_jumps = self.ergodic_jump_chain.ergodic_entropy
@@ -1030,8 +1029,7 @@ class LinearAutonomousPoolModel(object):
         """
         # the entropy rate is the entropy per unit time
         # thus the entropy per cycle over cycle length
-        theta_cycle = self.entropy_per_cycle
-        return theta_cycle/self.T_expected_value
+        return self.entropy_per_cycle / self.T_expected_value
         
         
 

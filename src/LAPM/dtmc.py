@@ -58,7 +58,7 @@ class DTMC(object):
 
     @property
     def expected_number_of_jumps(self):
-        """Return the (symbolic) expected number of jumps before absorption.
+        """Return the (symbolic) expected number of jumps BEFORE absorption.
 
         Returns:
             SymPy expression or numerical value: 
@@ -74,7 +74,7 @@ class DTMC(object):
         """
         n = self.n
         M = self.fundamental_matrix
-        jumps = sum(M*self.beta)
+        jumps = sum(M*self.beta) # sympy matrix multiplication
    
         return simplify(jumps)
 
