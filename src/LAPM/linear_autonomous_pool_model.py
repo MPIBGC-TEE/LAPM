@@ -662,7 +662,7 @@ class LinearAutonomousPoolModel(object):
             :func:`.phase_type.nth_moment`: Return the (symbolic) ``n`` th 
             moment of the phase-type distribution.
         """
-        return phase_type.nth_moment(self.eeta, self.B, n)
+        return phase_type.nth_moment(self.eta, self.B, n)
 
     def A_quantile(self, q, tol=1e-8):
         """Return a numerical quantile of the system age distribution.
