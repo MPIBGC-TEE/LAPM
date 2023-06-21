@@ -2,33 +2,35 @@
 
 """
 from __future__ import annotations
+
 from typing import Callable
 
 import numpy as np
 from numpy.linalg import matrix_power
-from scipy.linalg import inv, LinAlgError
+from scipy.linalg import LinAlgError, inv
 from scipy.special import factorial
 
 from LAPM import picklegzip
 
 
-class DiscreteLinearAutonomousPoolModel():
+class DiscreteLinearAutonomousPoolModel:
     """Discrete version of :class:`~LAPM.linear_autonomous_pool_model.LinearAutonomousPoolModel`.
 
     :math:`x_{n+1} = B\,x_n + U`, system in equilibrium
 
     Time step size is fixed to 1. No symbolic treatment, purely numerical.
     """
-    def __init__(self, U: np.ndarray, B:np.ndarray, check_row_sums: bool=True):
+
+    def __init__(self, U: np.ndarray, B: np.ndarray, check_col_sums: bool = True):
         """
         Args:
             U: one-dimensional external input vector
             B: discrete compartmental matrix
 
                 - nonnegative entries
-                - row sums not grater than 1
+                - col sums not grater than 1
 
-            check_row_sums: if False, the row sum condition will not be checked,
+            check_col_sums: if False, the column sum condition will not be checked,
                 can be useful in case of minimal transgressions
         """
         if (U < 0).sum() > 0:
@@ -37,30 +39,30 @@ class DiscreteLinearAutonomousPoolModel():
         if (B < 0).sum() > 0:
             raise ValueError("Negative values in discrete compartmental matrix.")
 
-        if check_row_sums:
-            row_sum_vector = B.sum(axis=0)
-            if (row_sum_vector > 1).sum() > 0:
-                raise ValueError("Row sums not bounded by 1 in discrete comp. matrix.")
+        if check_col_sums:
+            col_sum_vector = B.sum(axis=0)
+            if (col_sum_vector > 1).sum() > 0:
+                raise ValueError(
+                    "Column sums not bounded by 1 in discrete comp. matrix."
+                )
 
         self.U = U
         self.B = B
 
         Id = np.identity(self.nr_pools)
-       
-        # test if matrix is invertible 
-        inv(Id-B)
+
+        # test if matrix is invertible
+        inv(Id - B)
 
     def restrict_to_pools(
-        self,
-        pool_nrs: np.ndarray,
-        check_row_sums: bool=True
-    ) -> '__class__':
+        self, pool_nrs: np.ndarray, check_col_sums: bool = True
+    ) -> "__class__":
         """Restrict the discrete model run to a subset of pools.
 
         Args:
             pool_nrs: array of pool numbers INSIDE the resctricted model,
                 all other pools will be considered as OUSTIDE
-            check_row_sums: if False, the row sum condition will not be checked,
+            check_col_sums: if False, the column sum condition will not be checked,
                 can be useful in case of minimal transgressions
 
         Returns:
@@ -73,19 +75,19 @@ class DiscreteLinearAutonomousPoolModel():
         B_restricted = np.nan * np.ones((nr_pools, nr_pools))
         B_restricted = self.B[pool_nrs][:, pool_nrs]
 
-        dmr_eq_restricted = self.__class__(U_restricted, B_restricted, check_row_sums)
+        dmr_eq_restricted = self.__class__(U_restricted, B_restricted, check_col_sums)
         return dmr_eq_restricted
 
     @property
     def nr_pools(self) -> float:
         """Number of pools of the compartmental system."""
         return len(self.U)
-    
+
     @property
     def xss(self) -> np.ndarray:
         """Steady-state vector."""
         Id = np.identity(self.nr_pools)
-        return inv(Id-self.B) @ self.U
+        return inv(Id - self.B) @ self.U
 
     def _factorial_moment_vector(self, order: int) -> np.ndarray:
         """Internal method, helps to compute age moments."""
@@ -97,8 +99,8 @@ class DiscreteLinearAutonomousPoolModel():
         n = order
 
         fm = factorial(n) * inv(X) @ matrix_power(B, n)
-        fm = fm @ matrix_power(inv(Id-B), n) @ x
-    
+        fm = fm @ matrix_power(inv(Id - B), n) @ x
+
         return fm
 
     def age_moment_vector_up_to(self, up_to_order: int) -> np.ndarray:
@@ -111,6 +113,7 @@ class DiscreteLinearAutonomousPoolModel():
         Returns:
             nd.ndarray (up_to_order x nr_pools): age moment vectors
         """
+
         def stirling(n, k):
             n1 = n
             k1 = k
@@ -118,25 +121,24 @@ class DiscreteLinearAutonomousPoolModel():
                 return 1
             elif k <= 0:
                 return 0
-            elif (n == 0 and k == 0):
+            elif n == 0 and k == 0:
                 return -1
             elif n != 0 and n == k:
                 return 1
             elif n < k:
                 return 0
             else:
-                temp1 = stirling(n1-1, k1)
-                temp1 = k1*temp1
+                temp1 = stirling(n1 - 1, k1)
+                temp1 = k1 * temp1
 
-            return (k1*(stirling(n1-1, k1)))+stirling(n1-1, k1-1)
+            return (k1 * (stirling(n1 - 1, k1))) + stirling(n1 - 1, k1 - 1)
 
         nr_pools = self.nr_pools
         age_moments = []
-        for n in range(1, up_to_order+1):
+        for n in range(1, up_to_order + 1):
             m_moment = np.zeros(nr_pools)
-            for k in range(n+1):
-                m_moment += stirling(n, k) * \
-                    self._factorial_moment_vector(k)
+            for k in range(n + 1):
+                m_moment += stirling(n, k) * self._factorial_moment_vector(k)
 
             age_moments.append(m_moment)
 
@@ -144,13 +146,10 @@ class DiscreteLinearAutonomousPoolModel():
 
     def age_moment_vector(self, order: int) -> nd.npdarray:
         """Vector of age moment of requested ``order``."""
-        return self.age_moment_vector_up_to(order)[order-1]
+        return self.age_moment_vector_up_to(order)[order - 1]
 
     def system_age_moment(
-        self,
-        order: int,
-        xss: np.ndarray = None,
-        mask: np.ndarray = False
+        self, order: int, xss: np.ndarray = None, mask: np.ndarray = False
     ) -> float:
         """Moment of the age of all material in the system.
 
@@ -171,8 +170,8 @@ class DiscreteLinearAutonomousPoolModel():
 
         xss = np.ma.masked_array(xss, mask)
         total_mass = xss.sum()
-        
-        return (age_moment_vector*xss).sum()/total_mass
+
+        return (age_moment_vector * xss).sum() / total_mass
 
     def age_masses_func(self, xss: np.ndarray = None) -> Callable[[int], float]:
         """Function of age index, returns mass with with this age.
@@ -191,7 +190,7 @@ class DiscreteLinearAutonomousPoolModel():
         B = self.B
 
         def p0_self(ai):
-            if ai < 0: 
+            if ai < 0:
                 return np.zeros_like(U)
             return matrix_power(B, ai) @ U  # if age zero exists
 
@@ -199,7 +198,7 @@ class DiscreteLinearAutonomousPoolModel():
             return p0_self
         else:
             # rescale from fake equilibrium pool contents to start_vector contents
-            renorm_vector = xss / self.xss 
+            renorm_vector = xss / self.xss
             p0 = lambda ai: p0_self_eq(ai) * renorm_vector
             return p0
 
@@ -220,17 +219,18 @@ class DiscreteLinearAutonomousPoolModel():
         U = self.U
         B = self.B
 
-        IdmB_inv = inv(Id-B)
-        def P0_self(ai): # ai = age bin index
+        IdmB_inv = inv(Id - B)
+
+        def P0_self(ai):  # ai = age bin index
             if ai < 0:
                 return np.zeros_like(U)
-            return IdmB_inv @ (Id-matrix_power(B, ai+1)) @ U
+            return IdmB_inv @ (Id - matrix_power(B, ai + 1)) @ U
 
         if xss is None:
             return P0_self
         else:
             # rescale from fake equilibrium pool contents to start_vector contents
-            renorm_vector = xss / self.xss 
+            renorm_vector = xss / self.xss
             P0 = lambda ai: P0_self(ai) * renorm_vector
             return P0
 
@@ -274,9 +274,7 @@ class DiscreteLinearAutonomousPoolModel():
 
         return p0_tt
 
-
     #### disk operations ####
-
 
     @classmethod
     def load_from_file(cls, filename):
@@ -287,4 +285,3 @@ class DiscreteLinearAutonomousPoolModel():
     def save_to_file(self, filename):
         """Save a class instance to disk."""
         picklegzip.dump(self, filename)
-    
