@@ -3,11 +3,12 @@
 """
 from __future__ import annotations
 
+import warnings
 from typing import Callable
 
 import numpy as np
 from numpy.linalg import matrix_power
-from scipy.linalg import LinAlgError, inv
+from scipy.linalg import LinAlgError, det, pinv
 from scipy.special import factorial
 
 from LAPM import picklegzip
@@ -52,7 +53,8 @@ class DiscreteLinearAutonomousPoolModel:
         Id = np.identity(self.nr_pools)
 
         # test if matrix is invertible
-        inv(Id - B)
+        if det(Id - B) == 0:
+            warnings.warn("Id-B is singular, working with pseudo inverse now.")
 
     def restrict_to_pools(
         self, pool_nrs: np.ndarray, check_col_sums: bool = True
@@ -87,7 +89,7 @@ class DiscreteLinearAutonomousPoolModel:
     def xss(self) -> np.ndarray:
         """Steady-state vector."""
         Id = np.identity(self.nr_pools)
-        return inv(Id - self.B) @ self.U
+        return pinv(Id - self.B) @ self.U
 
     def _factorial_moment_vector(self, order: int) -> np.ndarray:
         """Internal method, helps to compute age moments."""
@@ -98,8 +100,8 @@ class DiscreteLinearAutonomousPoolModel:
         X = x * Id
         n = order
 
-        fm = factorial(n) * inv(X) @ matrix_power(B, n)
-        fm = fm @ matrix_power(inv(Id - B), n) @ x
+        fm = factorial(n) * pinv(X) @ matrix_power(B, n)
+        fm = fm @ matrix_power(pinv(Id - B), n) @ x
 
         return fm
 
@@ -219,7 +221,7 @@ class DiscreteLinearAutonomousPoolModel:
         U = self.U
         B = self.B
 
-        IdmB_inv = inv(Id - B)
+        IdmB_inv = pinv(Id - B)
 
         def P0_self(ai):  # ai = age bin index
             if ai < 0:
