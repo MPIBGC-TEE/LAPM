@@ -1,13 +1,14 @@
 """Module for discrete-time Markov chains (DTMCs)."""
 from __future__ import division
 
-from sympy import symbols, Matrix, diag, simplify, eye, Symbol, solve, Eq, ones
+from sympy import Eq, Matrix, Symbol, diag, eye, ones, simplify, solve, symbols
 
 from .helpers import entropy
 
 
 class Error(Exception):
     """Generic error occurring in this module."""
+
     pass
 
 
@@ -19,15 +20,25 @@ class DTMC(object):
         P (SymPy dxd-matrix): transition probability matrix
     """
 
-    #fixme: test
+    # fixme: test
     def __init__(self, beta, P):
-        """Return a DTMC with initial distribution beta and transition 
+        """Return a DTMC with initial distribution beta and transition
         probability matrix P.
 
-        Args: 
+        Args:
             beta (SymPy dx1-matrix): initial distribution
             P (Sympy dxd-matrix): transition probability matrix
         """
+        #        # throw away numerical artifacts if necessary and possible
+        #        d = P.rows
+        #        for i in range(d):
+        #            for j in range(d):
+        #                try:
+        #                    if P[i, j] < 1e-12:
+        #                        P[i, j] = 0
+        #                except TypeError:
+        #                    pass
+
         self.beta = beta
         self.P = P
 
@@ -39,9 +50,9 @@ class DTMC(object):
     @property
     def fundamental_matrix(self):
         """Return the (symbolic) fundamental matrix.
-    
+
         Returns:
-            SymPy or numerical dxd-matrix: 
+            SymPy or numerical dxd-matrix:
                 :math:`M=(I-P)^{-1}`
 
         Raises:
@@ -49,10 +60,11 @@ class DTMC(object):
                    no absorbing Markov chain is given
         """
         try:
-            M = (eye(self.P.rows)-self.P)**(-1)
+            M = (eye(self.P.rows) - self.P) ** (-1)
         except ValueError as err:
-            raise Error('P-I not invertible, probably no absorbing Markov chain'
-                        ' given.') from err
+            raise Error(
+                "P-I not invertible, probably no absorbing Markov chain" " given."
+            ) from err
 
         return simplify(M)
 
@@ -61,11 +73,11 @@ class DTMC(object):
         """Return the (symbolic) expected number of jumps BEFORE absorption.
 
         Returns:
-            SymPy expression or numerical value: 
+            SymPy expression or numerical value:
                 :math:`\\sum\\limits_{i=1}^n [M\\,\\beta]_i`
 
         See Also:
-            :func:`fundamental_matrix`: 
+            :func:`fundamental_matrix`:
             Return the (symbolic) fundamental matrix.
 
         Raises:
@@ -74,8 +86,8 @@ class DTMC(object):
         """
         n = self.n
         M = self.fundamental_matrix
-        jumps = sum(M*self.beta) # sympy matrix multiplication
-   
+        jumps = sum(M * self.beta)  # sympy matrix multiplication
+
         return simplify(jumps)
 
     @property
@@ -86,54 +98,59 @@ class DTMC(object):
             SymPy matrix: stationary distribution vector :math:`\\pi`
                 :math:`P\\,\\pi=\\pi,\\quad \\sum\\limits_{j=1}^n \\pi_j=1`
         """
+        try:
+            nu = self.fundamental_matrix * self.beta
+            nu = nu / sum(nu)
+            return nu
+        except Error as err:
+            pass
+
         n = self.n
-        nu = Matrix(n, 1, [Symbol('nu_%s' % (j+1)) for j in range(n)])
+        nu = Matrix(n, 1, [Symbol("nu_%s" % (j + 1)) for j in range(n)])
         # create an additional line for sum(nu_j)=1
         l = [x for x in nu] + [1]
-        v = Matrix(n+1, 1, l)
+        v = Matrix(n + 1, 1, l)
 
         l = [x for x in self.P]
-        l += [1]*n
-        P_extended = Matrix(n+1, n, l)
+        l += [1] * n
+        P_extended = Matrix(n + 1, n, l)
 
         # solve the system
-        sol = solve(Eq(P_extended*nu, v), nu)
-        #print('sol', sol)
-    
-        if sol == []: return None
+        sol = solve(Eq(P_extended * nu, v), nu)
+        # print('sol', sol)
+
+        if sol == []:
+            raise Error("Could not identify stationary distribution.") from err
 
         # make a vector out of dictionary solution
-        #print(nu)
+        # print(nu)
         l = [sol[x] for x in nu]
         return Matrix(l)
 
     @property
     def ergodic_entropy(self):
         """Return the ergodic entropy per jump.
-        
+
         Returns:
-            SymPy expression or float: 
+            SymPy expression or float:
                 :math:`\\sum\\limits_{j=1}^n \\pi_j\\sum\\limits_{i=1}^n`
                 :math:`-p_{ij}\\,\\log p_{ij}`
 
         See also:
-            :func:`stationary_distribution`: 
+            :func:`stationary_distribution`:
             Return the (symbolic) stationary distribution.
         """
         P = self.P
         nu = self.stationary_distribution
         n = self.n
-         
+
         theta = 0
         for j in range(n):
             x = 0
             for i in range(n):
-                x += entropy(P[i,j])
-    
+                x += entropy(P[i, j])
+
             x *= nu[j]
             theta += x
-    
-        return theta
 
-    
-    
+        return theta

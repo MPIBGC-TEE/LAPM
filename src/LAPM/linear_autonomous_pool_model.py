@@ -1,16 +1,19 @@
 """Module for linear autonomous pool models."""
-from __future__ import division
+from __future__ import annotations, division
 
 from math import factorial, sqrt
+from typing import List
 
 import numpy as np
+from CompartmentalSystems.smooth_reservoir_model import \
+    SmoothReservoirModel as SRM
 from scipy.linalg import expm
 from scipy.optimize import brentq
 from sympy import Matrix, diag, exp, eye, log, ones, simplify, symbols
 
 from . import phase_type
 from .dtmc import DTMC
-from .helpers import entropy
+from .helpers import draw_multinomial_from_sympy, entropy
 
 #############################################
 # Linear autonomous compartment model class #
@@ -345,6 +348,8 @@ class LinearAutonomousPoolModel(object):
 
         self.B = B
         self.u = u
+        self.force_numerical = force_numerical
+
         # compute matrix exponential if no symbols are involved
         if (not force_numerical) and ((B.is_Matrix) and (len(B.free_symbols) == 0)):
             t = symbols("t")
@@ -353,7 +358,6 @@ class LinearAutonomousPoolModel(object):
     @classmethod
     def from_random(cls, d: int, p: float):
         """Create a random compartmental system.
-
 
         Args:
             d: dimension of the matrix (number of pools)
@@ -416,6 +420,11 @@ class LinearAutonomousPoolModel(object):
         return Qt
 
     # public methods
+
+    @property
+    def nr_pools(self) -> int:
+        """Return the number of pools of the compartmental system."""
+        return len(self.u)
 
     @property
     def beta(self):
@@ -845,6 +854,11 @@ class LinearAutonomousPoolModel(object):
     # release
 
     @property
+    def z(self):
+        """Return external outflow rate vector, :math:`\\vec{z} = -1^T\,B`."""
+        return phase_type.z(self.B)
+
+    @property
     def r_compartments(self):
         """Return the (symbolic) release vector of the system in steady state.
 
@@ -877,6 +891,8 @@ class LinearAutonomousPoolModel(object):
         """
         return sum(self.r_compartments)
 
+    # jump chains and entropy
+
     @property
     def absorbing_jump_chain(self):
         """Return the absorbing jump chain as a discrete-time Markov chain.
@@ -897,8 +913,8 @@ class LinearAutonomousPoolModel(object):
         return DTMC(self.beta, P)
 
     @property
-    def ergodic_jump_chain(self):
-        """Return the ergodic jump chain as a discrete-time Markov chain.
+    def Q(self):
+        """Return the generator of the ergodic jump chain.
 
         The generator is given by
 
@@ -908,9 +924,35 @@ class LinearAutonomousPoolModel(object):
                     z^T & -1
                 \\end{pmatrix}
 
-        and the corresponding transition probability matrix :math:`P_Q` can
-        then be obtained from :math:`Q=(P_Q-I)\\,D_Q`, where :math:`D_Q` is the
-        diagonal matrix with entries from the diagonal of :math:`-Q`.
+        Returns:
+            sympy (d+1) x (d+1) matrix
+        """
+        B = self.B
+        beta = self.beta
+        z = self.z
+
+        d = B.rows
+
+        lor = []
+        for i in range(d):
+            row = list(B[i, :]) + [beta[i]]
+            lor.append(row)
+
+        row = list(z) + [-1]
+        lor.append(row)
+
+        Q = Matrix(lor)
+        return Q
+
+    @property
+    def ergodic_jump_chain(self):
+        """Return the ergodic jump chain as a discrete-time Markov chain.
+
+        Given the generator :meth:`~.linear_autonomous_pool_model.LinearAutonomousPoolModel.Q` of the
+        ergodic jump chain, the corresponding transition probability matrix
+        :math:`P_Q` can then be obtained from :math:`Q=(P_Q-I)\\,D_Q`,
+        where :math:`D_Q` is the diagonal matrix with entries from the
+        diagonal of :math:`-Q`.
 
         Returns:
            :class:`~.DTMC.DTMC`: :class:`DTMC` (beta_ext, Q) with
@@ -918,35 +960,40 @@ class LinearAutonomousPoolModel(object):
         """
         B = self.B
         d = B.rows
+        #
+        #        lor = []
+        #        for i in range(d):
+        #            row = list(B[i, :]) + [self.beta[i]]
+        #            lor.append(row)
+        #
+        #        row = list(phase_type.z(B)) + [-1]
+        #        lor.append(row)
+        #
+        #        # (d+1)x(d+1) matrix
+        #        # B     beta
+        #        # z^T     -1
+        #        Q = lor
+        #
+        #        P = Matrix(Q)
+        #        for j in range(d + 1):
+        #            for i in range(d + 1):
+        #                if Q[j][j] != 0:
+        #                    if i != j:
+        #                        P[i, j] = -Q[i][j] / Q[j][j]
+        #                    else:
+        #                        P[i, j] = 0
+        #                else:
+        #                    if i != j:
+        #                        P[i, j] = 0
+        #                    else:
+        #                        P[i, j] = 1
 
-        lor = []
-        for i in range(d):
-            row = list(B[i, :]) + [self.beta[i]]
-            lor.append(row)
-
-        row = list(phase_type.z(B)) + [-1]
-        lor.append(row)
-
-        # (d+1)x(d+1) matrix
-        # B     beta
-        # z^T     -1
-        Q = lor
-
-        P = Matrix(Q)
-        for j in range(d + 1):
-            for i in range(d + 1):
-                if Q[j][j] != 0:
-                    if i != j:
-                        P[i, j] = -Q[i][j] / Q[j][j]
-                    else:
-                        P[i, j] = 0
-                else:
-                    if i != j:
-                        P[i, j] = 0
-                    else:
-                        P[i, j] = 1
-
+        Q = self.Q
+        D_Q = -diag(*[Q[i, i] for i in range(d + 1)])
+        Id = eye(d + 1)
+        P = Q * D_Q**-1 + Id
         beta = Matrix(d + 1, 1, list(self.beta) + [0])
+
         return DTMC(beta, P)
 
     # fixme: to be tested
@@ -970,7 +1017,7 @@ class LinearAutonomousPoolModel(object):
               compartment :math:`d+1`)
 
         See Also:
-            :obj:`~.DTMC.DTMC.stationary_distribution`:
+            :obj:`~.dtmc.DTMC.stationary_distribution`:
             Return the (symbolic) stationary distribution.
         """
         d = self.B.rows
@@ -1004,7 +1051,7 @@ class LinearAutonomousPoolModel(object):
 
         See Also:
             | :obj:`entropy_per_jump`: Return the entropy per jump.
-            | :obj:`~.DTMC.DTMC.expected_number_of_jumps`:
+            | :obj:`~.dtmc.DTMC.expected_number_of_jumps`:
               Return the (symbolic) expected number of jumps before absorption.
         """
         theta_per_jump = self.entropy_per_jump
@@ -1029,3 +1076,100 @@ class LinearAutonomousPoolModel(object):
         # the entropy rate is the entropy per unit time
         # thus the entropy per cycle over cycle length
         return self.entropy_per_cycle / self.T_expected_value
+
+    # other
+
+    def get_srm(self, state_variable_names=None, time_symbol=None):
+        """Return a ``SmoothReservoirModel`` from ``u`` and ``B``."""
+        if state_variable_names is None:
+            state_variable_names = [f"x_{j+1}" for j in range(self.nr_pools)]
+
+        state_vector = Matrix([symbols(name) for name in state_variable_names])
+
+        if time_symbol is None:
+            time_symbol = symbols("t")
+
+        return SRM.from_B_u(state_vector, time_symbol, self.B, self.u)
+
+    def plot_pools_and_fluxes(self, ax, *args, **kwargs):
+        """Plot a schematic of pools and fluxes of the model."""
+        self.get_srm().plot_pools_and_fluxes(ax, *args, **kwargs)
+
+    @property
+    def time_reversed_system(self):
+        """Return the time-reversed compartmental system."""
+        u_hat = self.r_compartments
+
+        eta = self.eta
+        eta_inv = Matrix(len(eta), 1, [1 / x for x in eta])
+        B_hat = diag(*eta) * self.B.T * diag(*eta_inv)
+
+        return LinearAutonomousPoolModel(u_hat, B_hat)
+
+    @property
+    def normalized_ET_model(self):
+        """Normalize mean transit time to 1."""
+        B_normalized = self.B * self.T_expected_value
+        return LinearAutonomousPoolModel(
+            self.u, B_normalized, force_numerical=self.force_numerical
+        )
+
+    @property
+    def normalized_u_and_ET_model(self):
+        """Normalize the input vector to a probability and the mean transit time to 1."""
+        u_normalized = self.u / sum(self.u)
+        B_normalized = self.B * self.T_expected_value
+        return LinearAutonomousPoolModel(
+            u_normalized, B_normalized, force_numerical=self.force_numerical
+        )
+
+    def tau_from_confidence(self, q: float) -> float:
+        """Compute time step (scanning rate) to ensure not to miss a at confidence level ``q``.
+
+        Args:
+            lamda: pool rate (1/expected sojourn time), possibly fastest pool
+            q: between 0 and 1; 0.95 means high confidence and low ``tau``
+
+        Returns:
+            tau: time step to make sure to reach confidence level of not missing a pool
+        """
+        max_lamda = np.max([-self.B[i, i] for i in range(self.nr_pools)])
+        return -1 / max_lamda * np.log(q)
+
+    def simulate_pool_list(self, tau: float) -> List[int]:
+        """Sample a particle path from by discrete simulation with time step ``tau``."""
+        beta = self.beta
+        first_pool = draw_multinomial_from_sympy(beta)
+
+        B = self.B
+        z = self.z
+        lamda = lambda j: -B[j, j]
+        d = B.rows
+
+        # construct jump probability matrix
+        P = np.zeros((d + 1, d + 1))
+        for i in range(d + 1):
+            for j in range(d):
+                if (i != j) and (i < d):
+                    P[i, j] = B[i, j] * tau
+
+                if i == d:
+                    P[i, j] = z[j] * tau
+
+                if i == j:
+                    P[i, j] = 1 - (lamda(j) * tau)
+
+        if np.any(P < 0):
+            raise ValueError("Time step too coarse.")
+
+        current_pool = first_pool
+        pool_list = []
+
+        while current_pool < d:
+            pool_list.append(current_pool)
+
+            next_pool = draw_multinomial_from_sympy(P[:, current_pool])
+            current_pool = next_pool
+
+        pool_list.append(-1)
+        return pool_list
