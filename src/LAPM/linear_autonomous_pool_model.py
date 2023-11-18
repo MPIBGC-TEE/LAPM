@@ -193,9 +193,9 @@ def create_random_probability_vector(d: int, p: float) -> np.ndarray:
 
     Returns:
         random probability vector `v` s.t.
-        - :math:`v_i \geq 0`
-        - :math:`\mathbb{P}(v_i>0) = p`
-        - :math:`\sum_i v_i=1`
+        - :math:`v_i \\geq 0`
+        - :math:`\\mathbb{P}(v_i>0) = p`
+        - :math:`\\sum_i v_i=1`
     """
     v = np.random.binomial(1, p, d)
     v = v * np.random.uniform(0, 1, d)
@@ -536,7 +536,7 @@ class LinearAutonomousPoolModel(object):
             n (positive int): order of the moment
 
         Returns:
-            SymPy expression or numerical value: :math:`\mathbb{E}[T^n]`
+            SymPy expression or numerical value: :math:`\\mathbb{E}[T^n]`
 
         See Also:
             :func:`.phase_type.nth_moment`: Return the (symbolic) ``n`` th
@@ -855,7 +855,7 @@ class LinearAutonomousPoolModel(object):
 
     @property
     def z(self):
-        """Return external outflow rate vector, :math:`\\vec{z} = -1^T\,B`."""
+        """Return external outflow rate vector, :math:`\\vec{z} = -1^T\\,B`."""
         return phase_type.z(self.B)
 
     @property
